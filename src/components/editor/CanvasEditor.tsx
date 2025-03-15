@@ -5,8 +5,23 @@ import { useHistory } from '@/hooks/useHistory';
 import { ShapeRenderer } from './ShapeRenderer';
 import { Toolbar } from './Toolbar';
 import { PropertiesPanel } from './PropertiesPanel';
+import { Button } from '@/components/ui/button'
+import {
+  Drawer,
+  DrawerClose,
+  DrawerContent,
+  DrawerDescription,
+  DrawerFooter,
+  DrawerHeader,
+  DrawerTitle,
+  DrawerTrigger,
+} from "@/components/ui/drawer"
+
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faGear } from '@fortawesome/free-solid-svg-icons';
 
 export const CanvasEditor = () => {
+  const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
   const [backgroundImage, setBackgroundImage] = useState(null);
 
   const {
@@ -54,8 +69,13 @@ export const CanvasEditor = () => {
     const clickedOnEmpty = e.target === e.target.getStage();
     setSelectedId(clickedOnEmpty ? null : e.target.id());
     if (clickedOnEmpty) {
-      transformerRef.current.nodes([]);
+      clearSelection();
     }
+  };
+
+  const clearSelection = () => {
+    setSelectedId(null);
+    transformerRef.current.nodes([]);
   };
 
   useEffect(() => {
@@ -67,26 +87,69 @@ export const CanvasEditor = () => {
       }
     }
 
-    const image = new window.Image();
-    image.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><rect width="600" height="600" fill="%23f5f5f5"/><text x="50%" y="50%" font-family="Arial" font-size="24" fill="%23333" text-anchor="middle" dominant-baseline="middle">Background</text></svg>';
-    image.onload = () => {
-      setBackgroundImage(image);
-    };
+
+    // const image = new window.Image();
+    // image.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><rect width="600" height="600" fill="%23f5f5f5"/><text x="50%" y="50%" font-family="Arial" font-size="24" fill="%23333" text-anchor="middle" dominant-baseline="middle">Background</text></svg>';
+    // image.onload = () => {
+    //   setBackgroundImage(image);
+    // };
+
+    // const checkSize = () => {
+    //   setSize({
+    //     width: window.innerWidth,
+    //     height: window.innerHeight,
+    //   });
+    // };
+
+    // window.addEventListener('resize', checkSize);
+    // return () => window.removeEventListener('resize', checkSize);
   }, [selectedId]);
 
   return (
     <div className="flex flex-col p-4 gap-4 h-screen">
-      <Toolbar
-        onAddShape={handleShapeAdd}
-        onDelete={() => selectedId && deleteShape(selectedId)}
-        onUndo={undo}
-        onRedo={redo}
-        canUndo={canUndo}
-        canRedo={canRedo}
-      />
+      <div className='flex justify-between items-center gap-4'>
+        <Toolbar
+          onAddShape={handleShapeAdd}
+          onDelete={() => {
+            selectedId && deleteShape(selectedId);
+            pushState(shapes);
+            clearSelection();
+          }}
+          onUndo={undo}
+          onRedo={redo}
+          canUndo={canUndo}
+          canRedo={canRedo}
+        />
+        <Drawer>
+          <DrawerTrigger asChild>
+            <Button variant='outline' size="icon" className='h-full w-12 md:hidden'>
+              <FontAwesomeIcon icon={faGear} size='lg' />
+            </Button>
+          </DrawerTrigger>
+          <DrawerContent>
+            <DrawerHeader className="hidden">
+              <DrawerTitle>Properties</DrawerTitle>
+              <DrawerDescription>Properties panel</DrawerDescription>
+            </DrawerHeader>
 
-      <div className="grid grid-cols-5 gap-4 h-full">
-        <div className="col-span-4 flex items-center justify-center border shadow rounded-md">
+            <div className='px-4 py-2'>
+              <PropertiesPanel
+                selectedObject={shapes.find(shape => shape.id === selectedId)}
+                onUpdate={(property, value) => {
+                  if (selectedId) {
+                    updateShape(selectedId, { [property]: value });
+                    pushState(shapes);
+                  }
+                }}
+              />
+            </div>
+          </DrawerContent>
+        </Drawer>
+
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 h-full">
+        <div className="md:col-span-4 flex items-center justify-center border shadow rounded-md">
           <div className="bg-gray-100 w-[600px] h-[600px] overflow-hidden">
             <Stage
               width={600}
@@ -101,6 +164,7 @@ export const CanvasEditor = () => {
                     image={backgroundImage}
                     width={600}
                     height={600}
+                    onClick={() => clearSelection()}
                   />
                 )}
 
@@ -125,15 +189,17 @@ export const CanvasEditor = () => {
           </div>
         </div>
 
-        <PropertiesPanel
-          selectedObject={shapes.find(shape => shape.id === selectedId)}
-          onUpdate={(property, value) => {
-            if (selectedId) {
-              updateShape(selectedId, { [property]: value });
-              pushState(shapes);
-            }
-          }}
-        />
+        <div className='hidden md:block'>
+          <PropertiesPanel
+            selectedObject={shapes.find(shape => shape.id === selectedId)}
+            onUpdate={(property, value) => {
+              if (selectedId) {
+                updateShape(selectedId, { [property]: value });
+                pushState(shapes);
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   );

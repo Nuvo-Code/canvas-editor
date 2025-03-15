@@ -45,7 +45,7 @@ export const Toolbar = ({
   }
 
   return (
-    <div className="flex items-center gap-2 p-2 border shadow rounded-md">
+    <div className="flex items-center gap-2 p-2 border shadow rounded-md w-full overflow-x-scroll no-scrollbar">
       <div className="flex items-center gap-1">
         <Button
           variant="outline"
@@ -64,6 +64,7 @@ export const Toolbar = ({
           <PopoverContent className="flex flex-col justify-center items-center w-32">
             {shapes.map(({ type, label }) => (
               <Button
+                key={type}
                 variant="ghost"
                 className="w-full"
                 onClick={() => handleShapeAdd(type)}
@@ -83,6 +84,7 @@ export const Toolbar = ({
           <PopoverContent className="flex flex-col justify-center items-center w-32">
             {shapes.map(({ type, label }) => (
               <Button
+                key={type}
                 variant="ghost"
                 className="w-full"
                 onClick={() => handleShapeAdd(type)}
@@ -92,7 +94,6 @@ export const Toolbar = ({
             ))}
           </PopoverContent>
         </Popover>
-
       </div>
 
       <Separator orientation="vertical" className="mx-2 h-6" />
