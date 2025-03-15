@@ -2,7 +2,9 @@ import CanvasEditor from '@/components/editor/CanvasEditor'
 
 function App() {
   return (
-    <CanvasEditor />
+    <div className="h-screen">
+      <CanvasEditor />
+    </div>
   )
 }
 

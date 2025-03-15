@@ -1,89 +1,172 @@
-import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Card } from "@/components/ui/card";
-import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-import { Separator } from "@/components/ui/separator";
-import { Trash, Undo, Redo, Download, Image, Type, Square } from "lucide-react";
+import { useState } from 'react'
+import type { ShapeType, ToolbarProps } from '@/types/shapes'
+import { Button } from '@/components/ui/button'
+import { Separator } from '@/components/ui/separator'
+import {
+  Tooltip,
+  TooltipContent,
+  TooltipTrigger,
+} from '@/components/ui/tooltip'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
+import { Input } from '@/components/ui/input'
+import { Label } from '@/components/ui/label'
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faUndo, faRedo, faTriangleCircleSquare, faFileText, faTrash, faSquare, faPaintBrush } from '@fortawesome/free-solid-svg-icons'
 
-const Toolbar = ({ addText, addImage, addShape, deleteSelected, handleUndo, handleRedo, downloadDesign }) => {
-  const [imageUrl, setImageUrl] = useState("");
-  const [showImageInput, setShowImageInput] = useState(false);
+export const Toolbar = ({
+  onAddShape,
+  onDelete,
+  onUndo,
+  onRedo,
+  canUndo,
+  canRedo
+}: ToolbarProps) => {
+  const [selectedColor, setSelectedColor] = useState('#000000')
 
-  const handleImageSubmit = (e) => {
-    e.preventDefault();
-    if (imageUrl) {
-      addImage(imageUrl);
-      setImageUrl("");
-      setShowImageInput(false);
+  const shapes: { type: ShapeType; label: string; }[] = [
+    { type: 'rectangle', label: 'Rectangle' },
+    { type: 'circle', label: 'Circle' },
+    { type: 'triangle', label: 'Triangle' }
+  ]
+
+  const handleShapeAdd = (type: ShapeType) => {
+    const properties = {
+      fill: selectedColor,
+      ...(type === 'rectangle' && { width: 100, height: 100 }),
+      ...(type === 'circle' && { radius: 50 }),
+      ...(type === 'triangle' && { radius: 50 }),
+      ...(type === 'text' && { text: 'Double click to edit', fontSize: 16, width: 200 })
     }
-  };
+    onAddShape(type, properties)
+  }
 
   return (
-    <Card className="p-4 w-full space-y-4">
-      <h3 className="text-lg font-bold">Design Tools</h3>
-      <Separator />
-
-      <div className="space-y-2">
-        <h4 className="text-md font-semibold">Add Elements</h4>
-        <Button variant="outline" onClick={addText} className="w-full flex items-center gap-2">
-          <Type size={16} /> Add Text
+    <div className="flex items-center gap-2 p-2 border shadow rounded-md">
+      <div className="flex items-center gap-1">
+        <Button
+          variant="outline"
+          size="icon"
+          onClick={() => handleShapeAdd('text')}
+        >
+          <FontAwesomeIcon icon={faFileText} size='xl' />
         </Button>
-
-        <Button variant="outline" onClick={() => setShowImageInput(!showImageInput)} className="w-full flex items-center gap-2">
-          <Image size={16} /> Add Image
-        </Button>
-        {showImageInput && (
-          <form className="flex flex-col gap-2 mt-2" onSubmit={handleImageSubmit}>
-            <Input type="text" placeholder="Enter image URL" value={imageUrl} onChange={(e) => setImageUrl(e.target.value)} />
-            <Button type="submit">Add</Button>
-            <Button variant="secondary" onClick={() => setShowImageInput(false)}>Cancel</Button>
-            <Button variant="secondary" onClick={() => addImage()}>Use Placeholder</Button>
-          </form>
-        )}
 
         <Popover>
           <PopoverTrigger asChild>
-            <Button variant="outline" className="w-full flex items-center gap-2">
-              <Square size={16} /> Add Shape
+            <Button variant="outline">
+              <FontAwesomeIcon icon={faTriangleCircleSquare} size='xl' />
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="flex flex-col space-y-2">
-            <Button onClick={() => addShape("rectangle")} variant="ghost">Rectangle</Button>
-            <Button onClick={() => addShape("circle")} variant="ghost">Circle</Button>
-            <Button onClick={() => addShape("triangle")} variant="ghost">Triangle</Button>
+          <PopoverContent className="flex flex-col justify-center items-center w-32">
+            {shapes.map(({ type, label }) => (
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => handleShapeAdd(type)}
+              >
+                {label}
+              </Button>
+            ))}
           </PopoverContent>
         </Popover>
+
       </div>
 
-      <Separator />
-      <div className="space-y-2">
-        <h4 className="text-md font-semibold">Edit</h4>
-        <Button variant="destructive" onClick={deleteSelected} className="w-full flex items-center gap-2">
-          <Trash size={16} /> Delete
-        </Button>
-      </div>
+      <Separator orientation="vertical" className="mx-2 h-6" />
 
-      <Separator />
-      <div className="space-y-2">
-        <h4 className="text-md font-semibold">History</h4>
-        <Button variant="outline" onClick={handleUndo} className="w-full flex items-center gap-2">
-          <Undo size={16} /> Undo
-        </Button>
-        <Button variant="outline" onClick={handleRedo} className="w-full flex items-center gap-2">
-          <Redo size={16} /> Redo
-        </Button>
-      </div>
+      <Popover>
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <PopoverTrigger asChild>
+              <Button
+                variant="outline"
+                className="w-9 h-9"
+              >
+                <FontAwesomeIcon icon={faPaintBrush} size='xl' color={selectedColor} />
+                <span className="sr-only">Pick color</span>
+              </Button>
+            </PopoverTrigger>
+          </TooltipTrigger>
+        </Tooltip>
+        <PopoverContent className="w-64">
+          <div className="space-y-2">
+            <Label htmlFor="color">Color Picker</Label>
+            <div className="flex gap-2">
+              <Input
+                type="color"
+                id="color"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                className="w-[60px] h-[40px] p-1"
+              />
+              <Input
+                type="text"
+                value={selectedColor}
+                onChange={(e) => setSelectedColor(e.target.value)}
+                className="flex-1"
+              />
+            </div>
+          </div>
+        </PopoverContent>
+      </Popover>
 
-      <Separator />
-      <div className="space-y-2">
-        <h4 className="text-md font-semibold">Export</h4>
-        <Button variant="outline" onClick={downloadDesign} className="w-full flex items-center gap-2">
-          <Download size={16} /> Download
-        </Button>
-      </div>
-    </Card>
-  );
-};
+      <Separator orientation="vertical" className="mx-2 h-6" />
 
-export default Toolbar;
+      <Tooltip>
+        <TooltipTrigger asChild>
+          <Button
+            variant="outline"
+            size="icon"
+            onClick={onDelete}
+            className="text-destructive hover:text-destructive hover:bg-destructive/10"
+          >
+            <FontAwesomeIcon icon={faTrash} size='xl' />
+          </Button>
+        </TooltipTrigger>
+        <TooltipContent>
+          <p>Delete selected</p>
+        </TooltipContent>
+      </Tooltip>
+
+      <Separator orientation="vertical" className="mx-2 h-6" />
+
+      <div className="flex items-center gap-1">
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onUndo}
+              disabled={!canUndo}
+            >
+              <FontAwesomeIcon icon={faUndo} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Undo</p>
+          </TooltipContent>
+        </Tooltip>
+
+        <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
+              size="icon"
+              onClick={onRedo}
+              disabled={!canRedo}
+            >
+              <FontAwesomeIcon icon={faRedo} />
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Redo</p>
+          </TooltipContent>
+        </Tooltip>
+      </div>
+    </div>
+  )
+}

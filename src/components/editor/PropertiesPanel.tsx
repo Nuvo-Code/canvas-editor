@@ -1,135 +1,169 @@
-import React from "react";
-import { Card, CardHeader, CardTitle, CardContent } from "@/components/ui/card";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import { Select, SelectTrigger, SelectContent, SelectItem } from "@/components/ui/select";
+import type { Shape } from '@/types/shapes'
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
+import { Label } from '@/components/ui/label'
+import { Input } from '@/components/ui/input'
+import { Slider } from '@/components/ui/slider'
+import {
+  Tabs,
+  TabsContent,
+  TabsList,
+  TabsTrigger,
+} from '@/components/ui/tabs'
 
-const PropertiesPanel = ({ selectedObject, updateProperty }) => {
+interface PropertiesPanelProps {
+  selectedObject: Shape | undefined
+  onUpdate: (property: keyof Shape, value: any) => void
+}
+
+export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelProps) => {
   if (!selectedObject) {
     return (
-      <Card>
-        <CardHeader>
-          <CardTitle>Properties</CardTitle>
-        </CardHeader>
-        <CardContent>No object selected</CardContent>
+      <Card className="bg-background/60 backdrop-blur-sm">
+        <CardContent className="pt-6">
+          <p className="text-muted-foreground text-sm text-center">
+            Select an object to edit properties
+          </p>
+        </CardContent>
       </Card>
-    );
+    )
   }
 
-  const objectType = selectedObject.type;
+  const renderCommonProperties = () => (
+    <div className="space-y-4">
+      <div className="grid grid-cols-2 gap-4">
+        <div className="space-y-2">
+          <Label>X Position</Label>
+          <Input
+            type="number"
+            value={selectedObject.x}
+            onChange={(e) => onUpdate('x', parseInt(e.target.value))}
+          />
+        </div>
+        <div className="space-y-2">
+          <Label>Y Position</Label>
+          <Input
+            type="number"
+            value={selectedObject.y}
+            onChange={(e) => onUpdate('y', parseInt(e.target.value))}
+          />
+        </div>
+      </div>
+
+      <div className="space-y-2">
+        <Label>Fill Color</Label>
+        <div className="flex gap-2">
+          <Input
+            type="color"
+            value={selectedObject.fill || '#000000'}
+            onChange={(e) => onUpdate('fill', e.target.value)}
+            className="w-[60px] h-[40px] p-1"
+          />
+          <Input
+            type="text"
+            value={selectedObject.fill || '#000000'}
+            onChange={(e) => onUpdate('fill', e.target.value)}
+            className="flex-1"
+          />
+        </div>
+      </div>
+    </div>
+  )
+
+  const renderSpecificProperties = () => {
+    const properties = {
+      rectangle: (
+        <div className="space-y-4">
+          <div className="grid grid-cols-2 gap-4">
+            <div className="space-y-2">
+              <Label>Width</Label>
+              <Input
+                type="number"
+                value={selectedObject.width}
+                onChange={(e) => onUpdate('width', parseInt(e.target.value))}
+              />
+            </div>
+            <div className="space-y-2">
+              <Label>Height</Label>
+              <Input
+                type="number"
+                value={selectedObject.height}
+                onChange={(e) => onUpdate('height', parseInt(e.target.value))}
+              />
+            </div>
+          </div>
+        </div>
+      ),
+      circle: (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Radius</Label>
+            <Slider
+              min={1}
+              max={200}
+              step={1}
+              value={[selectedObject.radius || 0]}
+              onValueChange={([value]) => onUpdate('radius', value)}
+              className="py-4"
+            />
+            <Input
+              type="number"
+              value={selectedObject.radius}
+              onChange={(e) => onUpdate('radius', parseInt(e.target.value))}
+            />
+          </div>
+        </div>
+      ),
+      text: (
+        <div className="space-y-4">
+          <div className="space-y-2">
+            <Label>Text Content</Label>
+            <Input
+              value={selectedObject.text}
+              onChange={(e) => onUpdate('text', e.target.value)}
+            />
+          </div>
+          <div className="space-y-2">
+            <Label>Font Size</Label>
+            <Slider
+              min={8}
+              max={72}
+              step={1}
+              value={[selectedObject.fontSize || 16]}
+              onValueChange={([value]) => onUpdate('fontSize', value)}
+              className="py-4"
+            />
+            <Input
+              type="number"
+              value={selectedObject.fontSize}
+              onChange={(e) => onUpdate('fontSize', parseInt(e.target.value))}
+            />
+          </div>
+        </div>
+      )
+    }
+
+    return properties[selectedObject.type] || null
+  }
 
   return (
     <Card>
       <CardHeader>
-        <CardTitle>Properties</CardTitle>
+        <CardTitle className="text-lg font-medium">Properties</CardTitle>
       </CardHeader>
       <CardContent>
-        <div className="space-y-4">
-          <div>
-            <Label>Position</Label>
-            <div className="flex gap-2">
-              <Input
-                type="number"
-                value={Math.round(selectedObject.x)}
-                onChange={(e) => updateProperty("x", parseInt(e.target.value, 10))}
-              />
-              <Input
-                type="number"
-                value={Math.round(selectedObject.y)}
-                onChange={(e) => updateProperty("y", parseInt(e.target.value, 10))}
-              />
-            </div>
-          </div>
-
-          {objectType !== "circle" && objectType !== "triangle" ? (
-            <div>
-              <Label>Size</Label>
-              <div className="flex gap-2">
-                <Input
-                  type="number"
-                  value={Math.round(selectedObject.width)}
-                  onChange={(e) => updateProperty("width", parseInt(e.target.value, 10))}
-                />
-                <Input
-                  type="number"
-                  value={Math.round(selectedObject.height)}
-                  onChange={(e) => updateProperty("height", parseInt(e.target.value, 10))}
-                />
-              </div>
-            </div>
-          ) : (
-            <div>
-              <Label>Radius</Label>
-              <Input
-                type="number"
-                value={Math.round(selectedObject.radius)}
-                onChange={(e) => updateProperty("radius", parseInt(e.target.value, 10))}
-              />
-            </div>
-          )}
-
-          <div>
-            <Label>Rotation</Label>
-            <Input
-              type="number"
-              value={Math.round(selectedObject.rotation || 0)}
-              onChange={(e) => updateProperty("rotation", parseInt(e.target.value, 10))}
-            />
-          </div>
-
-          {objectType === "text" && (
-            <div>
-              <Label>Text</Label>
-              <Input
-                type="text"
-                value={selectedObject.text}
-                onChange={(e) => updateProperty("text", e.target.value)}
-              />
-              <Label>Font Size</Label>
-              <Input
-                type="number"
-                value={selectedObject.fontSize}
-                onChange={(e) => updateProperty("fontSize", parseInt(e.target.value, 10))}
-              />
-              <Label>Font Family</Label>
-              <Select
-                value={selectedObject.fontFamily}
-                onValueChange={(value) => updateProperty("fontFamily", value)}
-              >
-                <SelectTrigger>{selectedObject.fontFamily}</SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="Arial">Arial</SelectItem>
-                  <SelectItem value="Helvetica">Helvetica</SelectItem>
-                  <SelectItem value="Times New Roman">Times New Roman</SelectItem>
-                  <SelectItem value="Courier New">Courier New</SelectItem>
-                  <SelectItem value="Georgia">Georgia</SelectItem>
-                  <SelectItem value="Verdana">Verdana</SelectItem>
-                  <SelectItem value="Impact">Impact</SelectItem>
-                </SelectContent>
-              </Select>
-              <Label>Color</Label>
-              <Input
-                type="color"
-                value={selectedObject.fill}
-                onChange={(e) => updateProperty("fill", e.target.value)}
-              />
-            </div>
-          )}
-
-          {(objectType === "rectangle" || objectType === "circle" || objectType === "triangle") && (
-            <div>
-              <Label>Fill Color</Label>
-              <Input
-                type="color"
-                value={selectedObject.fill}
-                onChange={(e) => updateProperty("fill", e.target.value)}
-              />
-            </div>
-          )}
-        </div>
+        <Tabs defaultValue="common" className="w-full">
+          <TabsList className="w-full">
+            <TabsTrigger value="common" className="flex-1">Common</TabsTrigger>
+            <TabsTrigger value="specific" className="flex-1">Specific</TabsTrigger>
+          </TabsList>
+          <TabsContent value="common" className="mt-4">
+            {renderCommonProperties()}
+          </TabsContent>
+          <TabsContent value="specific" className="mt-4">
+            {renderSpecificProperties()}
+          </TabsContent>
+        </Tabs>
       </CardContent>
     </Card>
-  );
-};
-
-export default PropertiesPanel;
+  )
+}
