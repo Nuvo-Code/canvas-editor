@@ -1,14 +1,22 @@
 import type { Shape } from '@/types/shapes'
+import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Label } from '@/components/ui/label'
 import { Input } from '@/components/ui/input'
 import { Slider } from '@/components/ui/slider'
+import {
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from '@/components/ui/popover'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
 } from '@/components/ui/tabs'
+import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+import { ucwords } from '@/lib/utils'
 
 interface PropertiesPanelProps {
   selectedObject: Shape | undefined
@@ -137,6 +145,29 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
               value={selectedObject.fontSize}
               onChange={(e) => onUpdate('fontSize', parseInt(e.target.value))}
             />
+            <Popover>
+              <PopoverTrigger asChild>
+                <Button variant="outline" className="w-full">
+                  Aligment: {ucwords(selectedObject.alignment)}
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="flex flex-col justify-center items-center w-32">
+                <RadioGroup value={selectedObject.alignment} onValueChange={(value) => onUpdate('alignment', value)}>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="left" id="left" />
+                    <Label htmlFor="left">Left</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="center" id="center" />
+                    <Label htmlFor="center">Center</Label>
+                  </div>
+                  <div className="flex items-center space-x-2">
+                    <RadioGroupItem value="right" id="right" />
+                    <Label htmlFor="right">Right</Label>
+                  </div>
+                </RadioGroup>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
       )

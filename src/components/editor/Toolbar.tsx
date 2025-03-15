@@ -15,7 +15,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUndo, faRedo, faTriangleCircleSquare, faFileText, faTrash, faSquare, faPaintBrush } from '@fortawesome/free-solid-svg-icons'
+import { faUndo, faRedo, faTriangleCircleSquare, faFileText, faTrash, faPaintBrush, faImage } from '@fortawesome/free-solid-svg-icons'
 
 export const Toolbar = ({
   onAddShape,
@@ -39,7 +39,7 @@ export const Toolbar = ({
       ...(type === 'rectangle' && { width: 100, height: 100 }),
       ...(type === 'circle' && { radius: 50 }),
       ...(type === 'triangle' && { radius: 50 }),
-      ...(type === 'text' && { text: 'Double click to edit', fontSize: 16, width: 200 })
+      ...(type === 'text' && { text: 'Double click to edit', fontSize: 16, width: 200, alignment: "center" })
     }
     onAddShape(type, properties)
   }
@@ -59,6 +59,25 @@ export const Toolbar = ({
           <PopoverTrigger asChild>
             <Button variant="outline">
               <FontAwesomeIcon icon={faTriangleCircleSquare} size='xl' />
+            </Button>
+          </PopoverTrigger>
+          <PopoverContent className="flex flex-col justify-center items-center w-32">
+            {shapes.map(({ type, label }) => (
+              <Button
+                variant="ghost"
+                className="w-full"
+                onClick={() => handleShapeAdd(type)}
+              >
+                {label}
+              </Button>
+            ))}
+          </PopoverContent>
+        </Popover>
+
+        <Popover>
+          <PopoverTrigger asChild>
+            <Button variant="outline">
+              <FontAwesomeIcon icon={faImage} size='xl' />
             </Button>
           </PopoverTrigger>
           <PopoverContent className="flex flex-col justify-center items-center w-32">

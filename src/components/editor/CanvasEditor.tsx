@@ -1,5 +1,5 @@
-import { useEffect, useRef } from 'react';
-import { Stage, Layer, Transformer } from 'react-konva';
+import { useEffect, useRef, useState } from 'react';
+import { Stage, Layer, Transformer, Image } from 'react-konva';
 import { useShapeManager } from '@/hooks/useShapeManager';
 import { useHistory } from '@/hooks/useHistory';
 import { ShapeRenderer } from './ShapeRenderer';
@@ -7,6 +7,8 @@ import { Toolbar } from './Toolbar';
 import { PropertiesPanel } from './PropertiesPanel';
 
 export const CanvasEditor = () => {
+  const [backgroundImage, setBackgroundImage] = useState(null);
+
   const {
     shapes,
     selectedId,
@@ -39,9 +41,9 @@ export const CanvasEditor = () => {
       x: node.x(),
       y: node.y(),
       rotation: node.rotation(),
-      ...(node.width && { width: node.width() * node.scaleX() }),
-      ...(node.height && { height: node.height() * node.scaleY() }),
-      ...(node.radius && { radius: node.radius() * node.scaleX() })
+      // ...(node.width && { width: node.width() * node.scaleX() }),
+      // ...(node.height && { height: node.height() * node.scaleY() }),
+      // ...(node.radius && { radius: node.radius() * node.scaleX() })
     };
 
     updateShape(id, updates);
@@ -51,6 +53,9 @@ export const CanvasEditor = () => {
   const handleSelect = (e) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     setSelectedId(clickedOnEmpty ? null : e.target.id());
+    if (clickedOnEmpty) {
+      transformerRef.current.nodes([]);
+    }
   };
 
   useEffect(() => {
@@ -61,6 +66,12 @@ export const CanvasEditor = () => {
         transformerRef.current.getLayer().batchDraw();
       }
     }
+
+    const image = new window.Image();
+    image.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><rect width="600" height="600" fill="%23f5f5f5"/><text x="50%" y="50%" font-family="Arial" font-size="24" fill="%23333" text-anchor="middle" dominant-baseline="middle">Background</text></svg>';
+    image.onload = () => {
+      setBackgroundImage(image);
+    };
   }, [selectedId]);
 
   return (
@@ -85,6 +96,14 @@ export const CanvasEditor = () => {
               onTap={handleSelect}
             >
               <Layer>
+                {backgroundImage && (
+                  <Image
+                    image={backgroundImage}
+                    width={600}
+                    height={600}
+                  />
+                )}
+
                 {shapes.map(shape => (
                   <ShapeRenderer
                     key={shape.id}
@@ -93,7 +112,9 @@ export const CanvasEditor = () => {
                     onDragEnd={() => pushState(shapes)}
                   />
                 ))}
+
                 <Transformer
+                  enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
                   ref={transformerRef}
                   boundBoxFunc={(oldBox, newBox) => {
                     return newBox.width < 5 || newBox.height < 5 ? oldBox : newBox;

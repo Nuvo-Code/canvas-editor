@@ -17,7 +17,6 @@ export const ShapeRenderer = ({ shape, onTransformEnd, onDragEnd }: ShapeRendere
         onTransformEnd,
         onDragEnd,
     };
-
     switch (shape.type) {
         case 'rectangle':
             return <Rect {...commonProps} width={shape.width} height={shape.height} />;
@@ -34,6 +33,7 @@ export const ShapeRenderer = ({ shape, onTransformEnd, onDragEnd }: ShapeRendere
                     fontFamily={shape.fontFamily}
                     width={shape.width}
                     height={shape.height}
+                    align={shape.alignment}
                 />
             );
         case 'image':
