@@ -16,13 +16,13 @@ import {
   DrawerTitle,
   DrawerTrigger,
 } from "@/components/ui/drawer"
-
-import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faGear } from '@fortawesome/free-solid-svg-icons';
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
+import { faGear } from '@fortawesome/free-solid-svg-icons'
+import { tshirt } from '@/lib/mockups';
 
 export const CanvasEditor = () => {
   const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  const [backgroundImage, setBackgroundImage] = useState(null);
+  const [backgroundImage, setBackgroundImage] = useState<{ image: string } | null>(null);
 
   const {
     shapes,
@@ -78,6 +78,19 @@ export const CanvasEditor = () => {
     transformerRef.current.nodes([]);
   };
 
+  const handleExport = () => {
+    if (stageRef.current) {
+      const dataURL = stageRef.current.toDataURL();
+
+      const link = document.createElement("a");
+      link.href = dataURL;
+      link.download = "konva-image.png";
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+  };
+
   useEffect(() => {
     if (selectedId && transformerRef.current) {
       const node = transformerRef.current.getStage().findOne('#' + selectedId);
@@ -87,34 +100,21 @@ export const CanvasEditor = () => {
       }
     }
 
-
-    // const image = new window.Image();
-    // image.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="600" height="600" viewBox="0 0 600 600"><rect width="600" height="600" fill="%23f5f5f5"/><text x="50%" y="50%" font-family="Arial" font-size="24" fill="%23333" text-anchor="middle" dominant-baseline="middle">Background</text></svg>';
-    // image.onload = () => {
-    //   setBackgroundImage(image);
-    // };
-
-    // const checkSize = () => {
-    //   setSize({
-    //     width: window.innerWidth,
-    //     height: window.innerHeight,
-    //   });
-    // };
-
-    // window.addEventListener('resize', checkSize);
-    // return () => window.removeEventListener('resize', checkSize);
+    setBackgroundImage(tshirt);
   }, [selectedId]);
 
   return (
     <div className="flex flex-col p-4 gap-4 h-screen">
       <div className='flex justify-between items-center gap-4'>
         <Toolbar
+          selectedObject={shapes.find(shape => shape.id === selectedId)}
           onAddShape={handleShapeAdd}
           onDelete={() => {
             selectedId && deleteShape(selectedId);
             pushState(shapes);
             clearSelection();
           }}
+          onSave={() => handleExport()}
           onUndo={undo}
           onRedo={redo}
           canUndo={canUndo}
@@ -150,24 +150,18 @@ export const CanvasEditor = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 h-full">
         <div className="md:col-span-4 flex items-center justify-center border shadow rounded-md">
-          <div className="bg-gray-100 w-[600px] h-[600px] overflow-hidden">
+          <div className={"bg-gray-100 overflow-scroll w-[" + backgroundImage?.width + "px] h-[" + backgroundImage?.height + "px]"}>
+            {/* <img src={backgroundImage?.image} className={"w-[" + backgroundImage?.width + "px] h-[" + backgroundImage?.height + "px] absolute z-0"} /> */}
+
             <Stage
-              width={600}
-              height={600}
+              width={backgroundImage?.width}
+              height={backgroundImage?.height}
               ref={stageRef}
               onClick={handleSelect}
               onTap={handleSelect}
+              className={'absolute z-10'}
             >
               <Layer>
-                {backgroundImage && (
-                  <Image
-                    image={backgroundImage}
-                    width={600}
-                    height={600}
-                    onClick={() => clearSelection()}
-                  />
-                )}
-
                 {shapes.map(shape => (
                   <ShapeRenderer
                     key={shape.id}
@@ -189,17 +183,21 @@ export const CanvasEditor = () => {
           </div>
         </div>
 
-        <div className='hidden md:block'>
-          <PropertiesPanel
-            selectedObject={shapes.find(shape => shape.id === selectedId)}
-            onUpdate={(property, value) => {
-              if (selectedId) {
-                updateShape(selectedId, { [property]: value });
-                pushState(shapes);
-              }
-            }}
-          />
-        </div>
+        {
+          selectedId && (
+            <div className='hidden md:block'>
+              <PropertiesPanel
+                selectedObject={shapes.find(shape => shape.id === selectedId)}
+                onUpdate={(property, value) => {
+                  if (selectedId) {
+                    updateShape(selectedId, { [property]: value });
+                    pushState(shapes);
+                  }
+                }}
+              />
+            </div>
+          )
+        }
       </div>
     </div>
   );

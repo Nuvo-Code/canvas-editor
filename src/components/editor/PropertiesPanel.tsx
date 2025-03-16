@@ -177,7 +177,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
   }
 
   return (
-    <Card>
+    <Card className="h-full">
       <CardHeader>
         <CardTitle className="text-lg font-medium">Properties</CardTitle>
       </CardHeader>

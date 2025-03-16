@@ -15,11 +15,14 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUndo, faRedo, faTriangleCircleSquare, faFileText, faTrash, faPaintBrush, faImage } from '@fortawesome/free-solid-svg-icons'
+import { faUndo, faRedo, faTriangleCircleSquare, faFileText, faTrash, faPaintBrush, faImage, faSave } from '@fortawesome/free-solid-svg-icons'
+import ImageInputForm from './toolbar/ImageInputForm'
 
 export const Toolbar = ({
+  selectedObject,
   onAddShape,
   onDelete,
+  onSave,
   onUndo,
   onRedo,
   canUndo,
@@ -49,16 +52,17 @@ export const Toolbar = ({
       <div className="flex items-center gap-1">
         <Button
           variant="outline"
-          size="icon"
           onClick={() => handleShapeAdd('text')}
         >
           <FontAwesomeIcon icon={faFileText} size='xl' />
+          Text
         </Button>
 
         <Popover>
           <PopoverTrigger asChild>
             <Button variant="outline">
               <FontAwesomeIcon icon={faTriangleCircleSquare} size='xl' />
+              Shapes
             </Button>
           </PopoverTrigger>
           <PopoverContent className="flex flex-col justify-center items-center w-32">
@@ -79,24 +83,16 @@ export const Toolbar = ({
           <PopoverTrigger asChild>
             <Button variant="outline">
               <FontAwesomeIcon icon={faImage} size='xl' />
+              Image
             </Button>
           </PopoverTrigger>
-          <PopoverContent className="flex flex-col justify-center items-center w-32">
-            {shapes.map(({ type, label }) => (
-              <Button
-                key={type}
-                variant="ghost"
-                className="w-full"
-                onClick={() => handleShapeAdd(type)}
-              >
-                {label}
-              </Button>
-            ))}
+          <PopoverContent>
+            <ImageInputForm addImage={onAddShape} />
           </PopoverContent>
         </Popover>
       </div>
 
-      <Separator orientation="vertical" className="mx-2 h-6" />
+      <span className='mx-2 text-gray-300'>|</span>
 
       <Popover>
         <Tooltip>
@@ -104,10 +100,10 @@ export const Toolbar = ({
             <PopoverTrigger asChild>
               <Button
                 variant="outline"
-                className="w-9 h-9"
               >
                 <FontAwesomeIcon icon={faPaintBrush} size='xl' color={selectedColor} />
                 <span className="sr-only">Pick color</span>
+                Color
               </Button>
             </PopoverTrigger>
           </TooltipTrigger>
@@ -134,36 +130,37 @@ export const Toolbar = ({
         </PopoverContent>
       </Popover>
 
-      <Separator orientation="vertical" className="mx-2 h-6" />
-
-      <Tooltip>
-        <TooltipTrigger asChild>
-          <Button
-            variant="outline"
-            size="icon"
-            onClick={onDelete}
-            className="text-destructive hover:text-destructive hover:bg-destructive/10"
-          >
-            <FontAwesomeIcon icon={faTrash} size='xl' />
-          </Button>
-        </TooltipTrigger>
-        <TooltipContent>
-          <p>Delete selected</p>
-        </TooltipContent>
-      </Tooltip>
-
-      <Separator orientation="vertical" className="mx-2 h-6" />
+      <span className='mx-2 text-gray-300'>|</span>
 
       <div className="flex items-center gap-1">
         <Tooltip>
           <TooltipTrigger asChild>
             <Button
               variant="outline"
-              size="icon"
+              onClick={onDelete}
+              className="text-destructive hover:text-destructive hover:bg-destructive/10 mr-2"
+              disabled={!selectedObject}
+            >
+              <FontAwesomeIcon icon={faTrash} size='xl' />
+              <span className="sr-only">Delete</span>
+              Delete
+            </Button>
+          </TooltipTrigger>
+          <TooltipContent>
+            <p>Delete selected</p>
+          </TooltipContent>
+        </Tooltip>
+
+        {/* <Tooltip>
+          <TooltipTrigger asChild>
+            <Button
+              variant="outline"
               onClick={onUndo}
               disabled={!canUndo}
             >
               <FontAwesomeIcon icon={faUndo} />
+              <span className="sr-only">Undo</span>
+              Undo
             </Button>
           </TooltipTrigger>
           <TooltipContent>
@@ -175,17 +172,31 @@ export const Toolbar = ({
           <TooltipTrigger asChild>
             <Button
               variant="outline"
-              size="icon"
               onClick={onRedo}
               disabled={!canRedo}
             >
               <FontAwesomeIcon icon={faRedo} />
+              <span className="sr-only">Redo</span>
+              Redo
             </Button>
           </TooltipTrigger>
           <TooltipContent>
             <p>Redo</p>
           </TooltipContent>
-        </Tooltip>
+        </Tooltip> */}
+      </div>
+
+      <span className='mx-2 text-gray-300'>|</span>
+
+      <div className="flex items-center gap-1">
+        <Button
+          variant="outline"
+          onClick={onSave}
+        >
+          <FontAwesomeIcon icon={faSave} />
+          <span className="sr-only">Save</span>
+          Save
+        </Button>
       </div>
     </div>
   )

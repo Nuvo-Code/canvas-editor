@@ -19,8 +19,10 @@ export interface Shape {
 export type ShapeType = 'rectangle' | 'circle' | 'triangle' | 'text' | 'image';
 
 export interface ToolbarProps {
+    selectedObject: Shape | undefined;
     onAddShape: (type: ShapeType, properties?: Partial<Shape>) => void;
     onDelete: () => void;
+    onSave: () => void;
     onUndo: () => void;
     onRedo: () => void;
     canUndo: boolean;
