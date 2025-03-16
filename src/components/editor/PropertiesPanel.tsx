@@ -27,8 +27,11 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
   if (!selectedObject) {
     return (
       <Card className="bg-background/60 backdrop-blur-sm">
-        <CardContent className="pt-6">
-          <p className="text-muted-foreground text-sm text-center">
+        <CardHeader>
+          <CardTitle className="text-lg font-medium">Properties</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <p className="text-muted-foreground text-sm">
             Select an object to edit properties
           </p>
         </CardContent>

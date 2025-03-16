@@ -8,10 +8,8 @@ import { PropertiesPanel } from './PropertiesPanel';
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
-  DrawerClose,
   DrawerContent,
   DrawerDescription,
-  DrawerFooter,
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
@@ -21,9 +19,7 @@ import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { tshirt } from '@/lib/mockups';
 
 export const CanvasEditor = () => {
-  const [size, setSize] = useState({ width: window.innerWidth, height: window.innerHeight });
-  const [backgroundImage, setBackgroundImage] = useState<{ image: string } | null>(null);
-
+  const [backgroundImage, setBackgroundImage] = useState(tshirt());
   const {
     shapes,
     selectedId,
@@ -41,6 +37,7 @@ export const CanvasEditor = () => {
     canRedo
   } = useHistory(shapes);
 
+  const backgroundImageRef = useRef(null);
   const stageRef = useRef(null);
   const transformerRef = useRef(null);
 
@@ -98,9 +95,9 @@ export const CanvasEditor = () => {
         transformerRef.current.nodes([node]);
         transformerRef.current.getLayer().batchDraw();
       }
+    } else {
+      clearSelection();
     }
-
-    setBackgroundImage(tshirt);
   }, [selectedId]);
 
   return (
@@ -150,54 +147,57 @@ export const CanvasEditor = () => {
 
       <div className="grid grid-cols-1 md:grid-cols-5 gap-4 h-full">
         <div className="md:col-span-4 flex items-center justify-center border shadow rounded-md">
-          <div className={"bg-gray-100 overflow-scroll w-[" + backgroundImage?.width + "px] h-[" + backgroundImage?.height + "px]"}>
-            {/* <img src={backgroundImage?.image} className={"w-[" + backgroundImage?.width + "px] h-[" + backgroundImage?.height + "px] absolute z-0"} /> */}
-
-            <Stage
-              width={backgroundImage?.width}
-              height={backgroundImage?.height}
-              ref={stageRef}
-              onClick={handleSelect}
-              onTap={handleSelect}
-              className={'absolute z-10'}
-            >
-              <Layer>
-                {shapes.map(shape => (
-                  <ShapeRenderer
-                    key={shape.id}
-                    shape={shape}
-                    onTransformEnd={handleTransformEnd}
-                    onDragEnd={() => pushState(shapes)}
+          <Stage
+            width={600}
+            height={600}
+            ref={stageRef}
+            onClick={handleSelect}
+            onTap={handleSelect}
+            className='bg-gray-100 w-[600px] h-[600px] overflow-scroll rounded-lg'
+          >
+            <Layer>
+              {
+                backgroundImage?.image && (
+                  <Image
+                    ref={backgroundImageRef}
+                    image={backgroundImage.image}
+                    width={600}
+                    height={600}
                   />
-                ))}
+                )
+              }
 
-                <Transformer
-                  enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
-                  ref={transformerRef}
-                  boundBoxFunc={(oldBox, newBox) => {
-                    return newBox.width < 5 || newBox.height < 5 ? oldBox : newBox;
-                  }}
+              {shapes.map(shape => (
+                <ShapeRenderer
+                  key={shape.id}
+                  shape={shape}
+                  onTransformEnd={handleTransformEnd}
+                  onDragEnd={() => pushState(shapes)}
                 />
-              </Layer>
-            </Stage>
-          </div>
-        </div>
+              ))}
 
-        {
-          selectedId && (
-            <div className='hidden md:block'>
-              <PropertiesPanel
-                selectedObject={shapes.find(shape => shape.id === selectedId)}
-                onUpdate={(property, value) => {
-                  if (selectedId) {
-                    updateShape(selectedId, { [property]: value });
-                    pushState(shapes);
-                  }
+              <Transformer
+                enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
+                ref={transformerRef}
+                boundBoxFunc={(oldBox, newBox) => {
+                  return newBox.width < 5 || newBox.height < 5 ? oldBox : newBox;
                 }}
               />
-            </div>
-          )
-        }
+            </Layer>
+          </Stage>
+        </div>
+
+        <div className='hidden md:block'>
+          <PropertiesPanel
+            selectedObject={shapes.find(shape => shape.id === selectedId)}
+            onUpdate={(property, value) => {
+              if (selectedId) {
+                updateShape(selectedId, { [property]: value });
+                pushState(shapes);
+              }
+            }}
+          />
+        </div>
       </div>
     </div>
   );
