@@ -21,6 +21,8 @@ export function useShapeManager() {
     const [shapes, setShapes] = useState<Shape[]>([]);
     const [selectedId, setSelectedId] = useState<string | null>(null);
 
+    const getSelectedShape = () => shapes.find(shape => shape.id === selectedId);
+
     const addShape = (type: Shape['type'], properties: Partial<Shape>) => {
         const newShape: Shape = {
             id: generateId(),
@@ -54,6 +56,7 @@ export function useShapeManager() {
         shapes,
         selectedId,
         setSelectedId,
+        getSelectedShape,
         addShape,
         updateShape,
         deleteShape

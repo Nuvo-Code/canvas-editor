@@ -155,7 +155,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
                 </Button>
               </PopoverTrigger>
               <PopoverContent className="flex flex-col justify-center items-center w-32">
-                <RadioGroup value={selectedObject.alignment} onValueChange={(value) => onUpdate('alignment', value)}>
+                <RadioGroup value={selectedObject.alignment} onValueChange={(value: any) => onUpdate('alignment', value)}>
                   <div className="flex items-center space-x-2">
                     <RadioGroupItem value="left" id="left" />
                     <Label htmlFor="left">Left</Label>

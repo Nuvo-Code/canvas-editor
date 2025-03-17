@@ -24,6 +24,7 @@ export const CanvasEditor = () => {
     shapes,
     selectedId,
     setSelectedId,
+    getSelectedShape,
     addShape,
     updateShape,
     deleteShape
@@ -52,10 +53,7 @@ export const CanvasEditor = () => {
     const updates = {
       x: node.x(),
       y: node.y(),
-      rotation: node.rotation(),
-      // ...(node.width && { width: node.width() * node.scaleX() }),
-      // ...(node.height && { height: node.height() * node.scaleY() }),
-      // ...(node.radius && { radius: node.radius() * node.scaleX() })
+      rotation: node.rotation()
     };
 
     updateShape(id, updates);
@@ -88,6 +86,28 @@ export const CanvasEditor = () => {
     }
   };
 
+  const handleDelete = () => {
+    if (selectedId) {
+      deleteShape(selectedId);
+      pushState(shapes);
+      clearSelection();
+    }
+  };
+
+  const handleKeyDown = (e: KeyboardEvent) => {
+    switch (e.key) {
+      case 'Escape':
+        clearSelection();
+        break;
+      case 'Delete':
+      case 'Backspace':
+        handleDelete();
+        break;
+      default:
+        break;
+    }
+  };
+
   useEffect(() => {
     if (selectedId && transformerRef.current) {
       const node = transformerRef.current.getStage().findOne('#' + selectedId);
@@ -98,19 +118,18 @@ export const CanvasEditor = () => {
     } else {
       clearSelection();
     }
+
+    document.addEventListener('keydown', handleKeyDown);
+    return () => document.removeEventListener('keydown', handleKeyDown);
   }, [selectedId]);
 
   return (
     <div className="flex flex-col p-4 gap-4 h-screen">
       <div className='flex justify-between items-center gap-4'>
         <Toolbar
-          selectedObject={shapes.find(shape => shape.id === selectedId)}
+          selectedObject={getSelectedShape()}
           onAddShape={handleShapeAdd}
-          onDelete={() => {
-            selectedId && deleteShape(selectedId);
-            pushState(shapes);
-            clearSelection();
-          }}
+          onDelete={() => handleDelete()}
           onSave={() => handleExport()}
           onUndo={undo}
           onRedo={redo}
@@ -156,16 +175,14 @@ export const CanvasEditor = () => {
             className='bg-gray-100 w-[600px] h-[600px] overflow-scroll rounded-lg'
           >
             <Layer>
-              {
-                backgroundImage?.image && (
-                  <Image
-                    ref={backgroundImageRef}
-                    image={backgroundImage.image}
-                    width={600}
-                    height={600}
-                  />
-                )
-              }
+              {backgroundImage?.image && (
+                <Image
+                  ref={backgroundImageRef}
+                  image={backgroundImage.image}
+                  width={600}
+                  height={600}
+                />
+              )}
 
               {shapes.map(shape => (
                 <ShapeRenderer

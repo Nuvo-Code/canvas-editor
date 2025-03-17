@@ -1,7 +1,6 @@
 import { useState } from 'react'
 import type { ShapeType, ToolbarProps } from '@/types/shapes'
 import { Button } from '@/components/ui/button'
-import { Separator } from '@/components/ui/separator'
 import {
   Tooltip,
   TooltipContent,
@@ -15,7 +14,7 @@ import {
 import { Input } from '@/components/ui/input'
 import { Label } from '@/components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faUndo, faRedo, faTriangleCircleSquare, faFileText, faTrash, faPaintBrush, faImage, faSave } from '@fortawesome/free-solid-svg-icons'
+import { faTriangleCircleSquare, faFileText, faTrash, faPaintBrush, faImage, faSave } from '@fortawesome/free-solid-svg-icons'
 import ImageInputForm from './toolbar/ImageInputForm'
 
 export const Toolbar = ({
@@ -138,7 +137,7 @@ export const Toolbar = ({
             <Button
               variant="outline"
               onClick={onDelete}
-              className="text-destructive hover:text-destructive hover:bg-destructive/10 mr-2"
+              className="text-destructive hover:text-destructive hover:bg-destructive/10"
               disabled={!selectedObject}
             >
               <FontAwesomeIcon icon={faTrash} size='xl' />
@@ -150,40 +149,6 @@ export const Toolbar = ({
             <p>Delete selected</p>
           </TooltipContent>
         </Tooltip>
-
-        {/* <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              onClick={onUndo}
-              disabled={!canUndo}
-            >
-              <FontAwesomeIcon icon={faUndo} />
-              <span className="sr-only">Undo</span>
-              Undo
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Undo</p>
-          </TooltipContent>
-        </Tooltip>
-
-        <Tooltip>
-          <TooltipTrigger asChild>
-            <Button
-              variant="outline"
-              onClick={onRedo}
-              disabled={!canRedo}
-            >
-              <FontAwesomeIcon icon={faRedo} />
-              <span className="sr-only">Redo</span>
-              Redo
-            </Button>
-          </TooltipTrigger>
-          <TooltipContent>
-            <p>Redo</p>
-          </TooltipContent>
-        </Tooltip> */}
       </div>
 
       <span className='mx-2 text-gray-300'>|</span>
