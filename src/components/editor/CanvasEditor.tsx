@@ -24,6 +24,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { tshirt, allMockups } from '@/lib/mockups';
+import { ThemeToggle } from '@/components/ui/theme-toggle';
 import type { MockupProps } from '@/types/mockups';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
@@ -214,11 +215,14 @@ export const CanvasEditor = () => {
 
 
   return (
-    <div className="grid grid-cols-1 md:grid-cols-[300px_1fr_300px] gap-4 h-screen p-4">
+    <div className="grid grid-cols-1 md:grid-cols-[300px_1fr_300px] gap-4 h-screen p-4 bg-background text-foreground">
       {/* Left Column - Tools */}
-      <div className="border rounded-md p-4 overflow-y-auto">
+      <div className="border rounded-md p-4 overflow-y-auto bg-card">
         <div className="space-y-4">
-          <h2 className="text-lg font-medium">Design Tools</h2>
+          <div className="flex justify-between items-center">
+            <h2 className="text-lg font-medium">Design Tools</h2>
+            <ThemeToggle />
+          </div>
 
           <Toolbar
             selectedObject={getSelectedShape()}
@@ -249,7 +253,7 @@ export const CanvasEditor = () => {
       </div>
 
       {/* Middle Column - Canvas */}
-      <div className="flex items-center justify-center border rounded-md">
+      <div className="flex items-center justify-center border rounded-md bg-card shadow-md">
         <Stage
           width={600}
           height={600}
@@ -297,8 +301,8 @@ export const CanvasEditor = () => {
 
       {/* Right Column - Properties, Layers, Design Area */}
       <div className="flex flex-col gap-4 overflow-y-auto">
-        <div className="border rounded-md">
-          <Tabs defaultValue="properties" className="w-full">
+        <div className="border rounded-md bg-card shadow-md">
+          <Tabs defaultValue="properties" className="w-full p-2">
             <TabsList className="grid w-full grid-cols-2 sticky top-0 bg-background z-10">
               <TabsTrigger value="properties">Properties</TabsTrigger>
               <TabsTrigger value="layers">Layers</TabsTrigger>
@@ -343,7 +347,7 @@ export const CanvasEditor = () => {
         </div>
 
         {/* Product Options Section */}
-        <div className="border rounded-md">
+        <div className="border rounded-md bg-card shadow-md">
           <ProductOptions
             productName={`Custom ${backgroundImage.name}`}
             price={24.99}

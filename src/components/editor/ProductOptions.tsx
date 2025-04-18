@@ -88,16 +88,16 @@ export const ProductOptions = ({ productName, price }: ProductOptionsProps) => {
 
   return (
     <Card className="w-full">
-      <CardHeader className="pb-2">
+      <CardHeader className="pb-2 border-b">
         <CardTitle className="text-lg font-medium">{productName}</CardTitle>
-        <div className="text-xl font-bold">${price.toFixed(2)}</div>
+        <div className="text-xl font-bold text-primary">${price.toFixed(2)}</div>
       </CardHeader>
       <CardContent>
         <Table>
           <TableHeader>
-            <TableRow>
-              <TableHead className="w-[100px]">Size</TableHead>
-              <TableHead>Quantity</TableHead>
+            <TableRow className="bg-muted/50">
+              <TableHead className="w-[100px] font-bold">Size</TableHead>
+              <TableHead className="font-bold">Quantity</TableHead>
             </TableRow>
           </TableHeader>
           <TableBody>
@@ -111,7 +111,7 @@ export const ProductOptions = ({ productName, price }: ProductOptionsProps) => {
                       size="icon"
                       onClick={() => decrementQuantity(size)}
                       disabled={sizeQuantities[size] <= 0}
-                      className="rounded-r-none h-8 w-8"
+                      className="rounded-r-none h-8 w-8 border-primary/20"
                     >
                       <Minus className="h-3 w-3" />
                     </Button>
@@ -121,14 +121,14 @@ export const ProductOptions = ({ productName, price }: ProductOptionsProps) => {
                       max="99"
                       value={sizeQuantities[size]}
                       onChange={(e) => handleQuantityChange(size, e)}
-                      className="w-12 text-center rounded-none border-x-0 h-8 px-0"
+                      className="w-12 text-center rounded-none border-x-0 h-8 px-0 border-primary/20 focus:ring-primary"
                     />
                     <Button
                       variant="outline"
                       size="icon"
                       onClick={() => incrementQuantity(size)}
                       disabled={sizeQuantities[size] >= 99}
-                      className="rounded-l-none h-8 w-8"
+                      className="rounded-l-none h-8 w-8 border-primary/20"
                     >
                       <Plus className="h-3 w-3" />
                     </Button>
@@ -137,9 +137,9 @@ export const ProductOptions = ({ productName, price }: ProductOptionsProps) => {
               </TableRow>
             ))}
             {totalItems > 0 && (
-              <TableRow className="bg-muted/50">
-                <TableCell className="font-bold">Total</TableCell>
-                <TableCell className="font-bold">
+              <TableRow className="bg-primary/10 border-t-2 border-primary/20">
+                <TableCell className="font-bold text-primary">Total</TableCell>
+                <TableCell className="font-bold text-primary">
                   {totalItems} items (${totalAmount.toFixed(2)})
                 </TableCell>
               </TableRow>
@@ -147,9 +147,9 @@ export const ProductOptions = ({ productName, price }: ProductOptionsProps) => {
           </TableBody>
         </Table>
       </CardContent>
-      <CardFooter>
+      <CardFooter className="border-t pt-4">
         <Button
-          className="w-full"
+          className="w-full bg-primary hover:bg-primary/90"
           onClick={handleAddToCart}
           disabled={isAddingToCart || totalItems === 0}
         >

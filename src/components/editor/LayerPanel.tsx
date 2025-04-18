@@ -37,78 +37,70 @@ export const LayerPanel = ({
   };
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="text-lg font-medium">Layers</CardTitle>
-      </CardHeader>
-      <CardContent className="space-y-2 max-h-[400px] overflow-y-auto">
-        {layerShapes.length === 0 ? (
-          <p className="text-muted-foreground text-sm">No layers yet. Add shapes to your design.</p>
-        ) : (
-          layerShapes.map((shape) => (
-            <div
-              key={shape.id}
-              className={`flex items-center justify-between p-2 rounded-md border ${
-                selectedId === shape.id ? 'bg-accent/20 border-accent' : 'border-border'
-              }`}
-              onClick={() => onSelectShape(shape.id)}
+    layerShapes.length === 0 ? (
+      <p className="text-muted-foreground text-sm">No layers yet. Add shapes to your design.</p>
+    ) : (
+      layerShapes.map((shape) => (
+        <div
+          key={shape.id}
+          className={`flex items-center justify-between p-2 rounded-md border ${selectedId === shape.id ? 'bg-accent/20 border-accent' : 'border-border'
+            }`}
+          onClick={() => onSelectShape(shape.id)}
+        >
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium">{getLayerName(shape)}</span>
+          </div>
+          <div className="flex items-center gap-1">
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleVisibility(shape.id);
+              }}
             >
-              <div className="flex items-center gap-2">
-                <span className="text-sm font-medium">{getLayerName(shape)}</span>
-              </div>
-              <div className="flex items-center gap-1">
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleVisibility(shape.id);
-                  }}
-                >
-                  <FontAwesomeIcon icon={shape.visible === false ? faEyeSlash : faEye} size="sm" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onToggleLock(shape.id);
-                  }}
-                >
-                  <FontAwesomeIcon icon={shape.locked ? faLock : faLockOpen} size="sm" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onMoveLayer(shape.id, 'up');
-                  }}
-                  disabled={layerShapes.indexOf(shape) === layerShapes.length - 1}
-                >
-                  <FontAwesomeIcon icon={faArrowUp} size="sm" />
-                </Button>
-                <Button
-                  variant="ghost"
-                  size="icon"
-                  className="h-7 w-7"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    onMoveLayer(shape.id, 'down');
-                  }}
-                  disabled={layerShapes.indexOf(shape) === 0}
-                >
-                  <FontAwesomeIcon icon={faArrowDown} size="sm" />
-                </Button>
-              </div>
-            </div>
-          ))
-        )}
-      </CardContent>
-    </Card>
+              <FontAwesomeIcon icon={shape.visible === false ? faEyeSlash : faEye} size="sm" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggleLock(shape.id);
+              }}
+            >
+              <FontAwesomeIcon icon={shape.locked ? faLock : faLockOpen} size="sm" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveLayer(shape.id, 'up');
+              }}
+              disabled={layerShapes.indexOf(shape) === layerShapes.length - 1}
+            >
+              <FontAwesomeIcon icon={faArrowUp} size="sm" />
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="h-7 w-7"
+              onClick={(e) => {
+                e.stopPropagation();
+                onMoveLayer(shape.id, 'down');
+              }}
+              disabled={layerShapes.indexOf(shape) === 0}
+            >
+              <FontAwesomeIcon icon={faArrowDown} size="sm" />
+            </Button>
+          </div>
+        </div>
+      ))
+    )
   );
 };
 

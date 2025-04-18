@@ -357,24 +357,17 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
   }
 
   return (
-    <Card className="h-full">
-      <CardHeader>
-        <CardTitle className="text-lg font-medium">Properties</CardTitle>
-      </CardHeader>
-      <CardContent>
-        <Tabs defaultValue="common" className="w-full">
-          <TabsList className="w-full">
-            <TabsTrigger value="common" className="flex-1">Common</TabsTrigger>
-            <TabsTrigger value="specific" className="flex-1">Specific</TabsTrigger>
-          </TabsList>
-          <TabsContent value="common" className="mt-4">
-            {renderCommonProperties()}
-          </TabsContent>
-          <TabsContent value="specific" className="mt-4">
-            {renderSpecificProperties()}
-          </TabsContent>
-        </Tabs>
-      </CardContent>
-    </Card>
+    <Tabs defaultValue="common" className="w-full">
+      <TabsList className="w-full">
+        <TabsTrigger value="common" className="flex-1">Common</TabsTrigger>
+        <TabsTrigger value="specific" className="flex-1">Specific</TabsTrigger>
+      </TabsList>
+      <TabsContent value="common" className="mt-4">
+        {renderCommonProperties()}
+      </TabsContent>
+      <TabsContent value="specific" className="mt-4">
+        {renderSpecificProperties()}
+      </TabsContent>
+    </Tabs>
   )
 }
