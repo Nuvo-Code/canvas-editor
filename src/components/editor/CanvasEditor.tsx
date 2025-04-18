@@ -303,7 +303,7 @@ export const CanvasEditor = () => {
       <div className="flex flex-col gap-4 overflow-y-auto">
         <div className="border rounded-md bg-card shadow-md">
           <Tabs defaultValue="properties" className="w-full p-2">
-            <TabsList className="grid w-full grid-cols-2 sticky top-0 bg-background z-10">
+            <TabsList className="grid w-full grid-cols-2 top-0 bg-background z-10">
               <TabsTrigger value="properties">Properties</TabsTrigger>
               <TabsTrigger value="layers">Layers</TabsTrigger>
             </TabsList>
@@ -319,7 +319,7 @@ export const CanvasEditor = () => {
                   }}
                 />
               ) : (
-                <div className="text-center py-8 text-muted-foreground">
+                <div className="text-muted-foreground text-xs">
                   Select an element to edit its properties
                 </div>
               )}

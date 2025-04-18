@@ -103,7 +103,7 @@ export const LayerPanel = ({
   };
 
   if (layerShapes.length === 0) {
-    return <p className="text-muted-foreground text-sm">No layers yet. Add shapes to your design.</p>;
+    return <p className="text-muted-foreground text-xs">No layers yet. Add shapes to your design.</p>;
   }
 
   // Version with HTML5 drag and drop
