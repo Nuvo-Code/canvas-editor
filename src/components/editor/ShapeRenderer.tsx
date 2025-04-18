@@ -5,9 +5,11 @@ interface ShapeRendererProps {
     shape: Shape;
     onTransformEnd: (e: any) => void;
     onDragEnd: () => void;
+    onDragMove?: (e: any) => void;
+    onDragStart?: (e: any) => void;
 }
 
-export const ShapeRenderer = ({ shape, onTransformEnd, onDragEnd }: ShapeRendererProps) => {
+export const ShapeRenderer = ({ shape, onTransformEnd, onDragEnd, onDragMove, onDragStart }: ShapeRendererProps) => {
     // Don't render if shape is not visible
     if (shape.visible === false) {
         return null;
@@ -24,6 +26,8 @@ export const ShapeRenderer = ({ shape, onTransformEnd, onDragEnd }: ShapeRendere
         draggable: shape.locked ? false : shape.draggable,
         onTransformEnd,
         onDragEnd,
+        onDragMove,
+        onDragStart,
     };
 
     switch (shape.type) {

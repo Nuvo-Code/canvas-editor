@@ -1,5 +1,6 @@
 import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Transformer, Image } from 'react-konva';
+import AlignmentGuides from './AlignmentGuides';
 import { useShapeManager } from '@/hooks/useShapeManager';
 import { useHistory } from '@/hooks/useHistory';
 import { ShapeRenderer } from './ShapeRenderer';
@@ -71,6 +72,11 @@ export const CanvasEditor = () => {
   const backgroundImageRef = useRef(null);
   const stageRef = useRef(null);
   const transformerRef = useRef(null);
+
+  // State for alignment guides
+  const [guides, setGuides] = useState({ vertical: [], horizontal: [] });
+  const [activeShape, setActiveShape] = useState(null);
+  const SNAP_THRESHOLD = 10; // Distance in pixels to trigger snapping
 
   const handleShapeAdd = (type: string, properties = {}) => {
     // Set initial position to center of designable area
@@ -176,6 +182,188 @@ export const CanvasEditor = () => {
       link.click();
       document.body.removeChild(link);
     }
+  };
+
+  // Calculate alignment guides for the active shape
+  const calculateGuides = (activeNode) => {
+    if (!activeNode) return { vertical: [], horizontal: [] };
+
+    // Get active shape dimensions
+    const activeX = activeNode.x();
+    const activeY = activeNode.y();
+    const activeWidth = activeNode.width ? activeNode.width() : (activeNode.radius ? activeNode.radius() * 2 : 0);
+    const activeHeight = activeNode.height ? activeNode.height() : (activeNode.radius ? activeNode.radius() * 2 : 0);
+
+    // Points to check for alignment
+    const activeLeft = activeX;
+    const activeRight = activeX + activeWidth;
+    const activeTop = activeY;
+    const activeBottom = activeY + activeHeight;
+    const activeMiddleX = activeX + activeWidth / 2;
+    const activeMiddleY = activeY + activeHeight / 2;
+
+    const verticalGuides = [];
+    const horizontalGuides = [];
+
+    // Add guides for designable area
+    const designLeft = designableArea.x;
+    const designRight = designableArea.x + designableArea.size;
+    const designTop = designableArea.y;
+    const designBottom = designableArea.y + designableArea.size;
+    const designMiddleX = designableArea.x + designableArea.size / 2;
+    const designMiddleY = designableArea.y + designableArea.size / 2;
+
+    // Check for alignment with designable area
+    // Vertical alignments (left, center, right)
+    if (Math.abs(activeLeft - designLeft) < SNAP_THRESHOLD) {
+      verticalGuides.push(designLeft);
+    }
+    if (Math.abs(activeMiddleX - designMiddleX) < SNAP_THRESHOLD) {
+      verticalGuides.push(designMiddleX);
+    }
+    if (Math.abs(activeRight - designRight) < SNAP_THRESHOLD) {
+      verticalGuides.push(designRight);
+    }
+
+    // Horizontal alignments (top, middle, bottom)
+    if (Math.abs(activeTop - designTop) < SNAP_THRESHOLD) {
+      horizontalGuides.push(designTop);
+    }
+    if (Math.abs(activeMiddleY - designMiddleY) < SNAP_THRESHOLD) {
+      horizontalGuides.push(designMiddleY);
+    }
+    if (Math.abs(activeBottom - designBottom) < SNAP_THRESHOLD) {
+      horizontalGuides.push(designBottom);
+    }
+
+    // Check for alignment with other shapes
+    shapes.forEach(shape => {
+      // Skip the active shape itself
+      if (shape.id === activeNode.id()) return;
+      if (shape.visible === false) return;
+
+      // Get shape dimensions
+      const shapeX = shape.x;
+      const shapeY = shape.y;
+      const shapeWidth = shape.width || (shape.radius ? shape.radius * 2 : 0);
+      const shapeHeight = shape.height || (shape.radius ? shape.radius * 2 : 0);
+
+      // Points to check for alignment
+      const shapeLeft = shapeX;
+      const shapeRight = shapeX + shapeWidth;
+      const shapeTop = shapeY;
+      const shapeBottom = shapeY + shapeHeight;
+      const shapeMiddleX = shapeX + shapeWidth / 2;
+      const shapeMiddleY = shapeY + shapeHeight / 2;
+
+      // Vertical alignments (left, center, right)
+      if (Math.abs(activeLeft - shapeLeft) < SNAP_THRESHOLD) {
+        verticalGuides.push(shapeLeft);
+      }
+      if (Math.abs(activeMiddleX - shapeMiddleX) < SNAP_THRESHOLD) {
+        verticalGuides.push(shapeMiddleX);
+      }
+      if (Math.abs(activeRight - shapeRight) < SNAP_THRESHOLD) {
+        verticalGuides.push(shapeRight);
+      }
+      if (Math.abs(activeLeft - shapeRight) < SNAP_THRESHOLD) {
+        verticalGuides.push(shapeRight);
+      }
+      if (Math.abs(activeRight - shapeLeft) < SNAP_THRESHOLD) {
+        verticalGuides.push(shapeLeft);
+      }
+
+      // Horizontal alignments (top, middle, bottom)
+      if (Math.abs(activeTop - shapeTop) < SNAP_THRESHOLD) {
+        horizontalGuides.push(shapeTop);
+      }
+      if (Math.abs(activeMiddleY - shapeMiddleY) < SNAP_THRESHOLD) {
+        horizontalGuides.push(shapeMiddleY);
+      }
+      if (Math.abs(activeBottom - shapeBottom) < SNAP_THRESHOLD) {
+        horizontalGuides.push(shapeBottom);
+      }
+      if (Math.abs(activeTop - shapeBottom) < SNAP_THRESHOLD) {
+        horizontalGuides.push(shapeBottom);
+      }
+      if (Math.abs(activeBottom - shapeTop) < SNAP_THRESHOLD) {
+        horizontalGuides.push(shapeTop);
+      }
+    });
+
+    // Remove duplicates
+    const uniqueVertical = [...new Set(verticalGuides)];
+    const uniqueHorizontal = [...new Set(horizontalGuides)];
+
+    return { vertical: uniqueVertical, horizontal: uniqueHorizontal };
+  };
+
+  // Handle drag start - identify the active shape
+  const handleDragStart = (e) => {
+    setActiveShape(e.target);
+    // Clear guides initially
+    setGuides({ vertical: [], horizontal: [] });
+  };
+
+  // Handle drag move - calculate and update guides
+  const handleDragMove = (e) => {
+    // Calculate guides based on current position
+    const guides = calculateGuides(e.target);
+    setGuides(guides);
+
+    // Apply snapping if needed
+    const node = e.target;
+    const nodeWidth = node.width ? node.width() : (node.radius ? node.radius() * 2 : 0);
+    const nodeHeight = node.height ? node.height() : (node.radius ? node.radius() * 2 : 0);
+
+    // Snap to vertical guides
+    guides.vertical.forEach(guideX => {
+      const nodeLeft = node.x();
+      const nodeRight = nodeLeft + nodeWidth;
+      const nodeMiddleX = nodeLeft + nodeWidth / 2;
+
+      // Snap left edge
+      if (Math.abs(nodeLeft - guideX) < SNAP_THRESHOLD) {
+        node.x(guideX);
+      }
+      // Snap center
+      else if (Math.abs(nodeMiddleX - guideX) < SNAP_THRESHOLD) {
+        node.x(guideX - nodeWidth / 2);
+      }
+      // Snap right edge
+      else if (Math.abs(nodeRight - guideX) < SNAP_THRESHOLD) {
+        node.x(guideX - nodeWidth);
+      }
+    });
+
+    // Snap to horizontal guides
+    guides.horizontal.forEach(guideY => {
+      const nodeTop = node.y();
+      const nodeBottom = nodeTop + nodeHeight;
+      const nodeMiddleY = nodeTop + nodeHeight / 2;
+
+      // Snap top edge
+      if (Math.abs(nodeTop - guideY) < SNAP_THRESHOLD) {
+        node.y(guideY);
+      }
+      // Snap middle
+      else if (Math.abs(nodeMiddleY - guideY) < SNAP_THRESHOLD) {
+        node.y(guideY - nodeHeight / 2);
+      }
+      // Snap bottom edge
+      else if (Math.abs(nodeBottom - guideY) < SNAP_THRESHOLD) {
+        node.y(guideY - nodeHeight);
+      }
+    });
+  };
+
+  // Handle drag end - clear guides and update state
+  const handleDragEnd = () => {
+    // Clear guides
+    setGuides({ vertical: [], horizontal: [] });
+    setActiveShape(null);
+    // Save the state
+    pushState(shapes);
   };
 
   const handleDelete = () => {
@@ -288,12 +476,22 @@ export const CanvasEditor = () => {
               size={designableArea.size}
             />
 
+            {/* Alignment guides */}
+            <AlignmentGuides
+              activeShape={activeShape}
+              shapes={shapes}
+              designableArea={designableArea}
+              guides={guides}
+            />
+
             {shapes.map(shape => (
               <ShapeRenderer
                 key={shape.id}
                 shape={shape}
                 onTransformEnd={handleTransformEnd}
-                onDragEnd={() => pushState(shapes)}
+                onDragStart={handleDragStart}
+                onDragMove={handleDragMove}
+                onDragEnd={handleDragEnd}
               />
             ))}
 
