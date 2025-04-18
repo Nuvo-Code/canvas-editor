@@ -6,6 +6,9 @@
 
 Canvas Editor is a powerful, browser-based design tool that allows users to create custom designs for printable products like t-shirts, mugs, and other merchandise. Built with modern web technologies, it provides an intuitive interface for both novice and professional designers.
 
+<img src="./screenshots/ui-1.png" alt="Canvas Editor Screenshot 1">
+<img src="./screenshots/ui-2.png" alt="Canvas Editor Screenshot 2">
+
 ## Features
 
 ### Intuitive Design Interface
