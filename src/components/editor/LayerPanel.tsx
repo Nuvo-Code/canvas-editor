@@ -94,7 +94,6 @@ export const LayerPanel = ({
 
     // Reverse back to get the original order and update the shapes
     const newShapes = [...reorderedLayers].reverse();
-    console.log('Reordering layers:', { dragIndex, dropIndex, newShapes });
     setShapes(newShapes);
 
     // Reset drag state

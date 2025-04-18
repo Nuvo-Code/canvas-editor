@@ -85,6 +85,15 @@ export const CanvasEditor = () => {
     const x = centerX - (width / 2);
     const y = centerY - (height / 2);
 
+    // Special handling for clipart
+    if (type === 'clipart') {
+      // Verify the image is valid
+      if (!(properties.image instanceof HTMLImageElement)) {
+        console.error('Invalid image for clipart:', properties.image);
+        return; // Don't add invalid clipart
+      }
+    }
+
     // Create the new shape with constrained position
     const newShape = addShape(type, { ...properties, x, y });
     pushState([...shapes, newShape]);
@@ -331,7 +340,6 @@ export const CanvasEditor = () => {
                   pushState(shapes);
                 }}
                 setShapes={(newShapes) => {
-                  console.log('Setting new shapes from drag and drop:', newShapes);
                   setShapes(newShapes);
                   pushState(newShapes);
                 }}
@@ -415,7 +423,6 @@ export const CanvasEditor = () => {
                       pushState(shapes);
                     }}
                     setShapes={(newShapes) => {
-                      console.log('Setting new shapes from mobile drawer:', newShapes);
                       setShapes(newShapes);
                       pushState(newShapes);
                     }}

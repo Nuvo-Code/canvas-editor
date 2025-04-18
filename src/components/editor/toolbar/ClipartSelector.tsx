@@ -1,6 +1,7 @@
 import { useState } from "react";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Button } from "../../ui/button";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../ui/tabs";
+import { ShapeType } from '../../../types/shapes';
 
 // Sample clipart categories and items
 const clipartCategories = [
@@ -31,24 +32,69 @@ const clipartCategories = [
 ];
 
 interface ClipartSelectorProps {
-  addClipart: (type: string, properties: any) => void;
+  addClipart: (type: ShapeType, properties: any) => void;
 }
 
 export default function ClipartSelector({ addClipart }: ClipartSelectorProps) {
   const [selectedCategory, setSelectedCategory] = useState(clipartCategories[0].name);
 
   const handleClipartSelect = (url: string) => {
-    const img = new Image();
-    img.src = url;
+    // Create a new image element using a different approach
+    const img = document.createElement('img');
 
-    img.onload = () => {
-      addClipart('clipart', {
-        image: img,
-        width: 100,
-        height: 100,
-        clipartType: url
-      });
+    // Set crossOrigin to allow images from different domains
+    img.crossOrigin = 'anonymous';
+
+    // Set up error handling
+    img.onerror = (err) => {
+      console.error('Error loading clipart image:', err);
+      alert('Failed to load the clipart image. Please try another one.');
     };
+
+    // Set up onload handler
+    img.onload = () => {
+      // Create a canvas to ensure the image is fully loaded and processed
+      const canvas = document.createElement('canvas');
+      canvas.width = img.width;
+      canvas.height = img.height;
+      const ctx = canvas.getContext('2d');
+
+      if (ctx) {
+        // Draw the image on the canvas
+        ctx.drawImage(img, 0, 0);
+
+        // Create a new image from the canvas
+        const processedImg = new Image();
+        processedImg.crossOrigin = 'anonymous';
+
+        processedImg.onload = () => {
+          // Add the clipart to the canvas
+          addClipart('clipart', {
+            image: processedImg,
+            width: 100,
+            height: 100,
+            clipartType: url,
+            // Add additional properties to ensure proper rendering
+            fill: undefined,  // No fill for images
+            stroke: undefined  // No stroke for images
+          });
+        };
+
+        // Convert canvas to data URL and set as source for the processed image
+        processedImg.src = canvas.toDataURL('image/png');
+      } else {
+        // Fallback if canvas context is not available
+        addClipart('clipart', {
+          image: img,
+          width: 100,
+          height: 100,
+          clipartType: url
+        });
+      }
+    };
+
+    // Set the source after setting up the onload handler
+    img.src = url;
   };
 
   return (

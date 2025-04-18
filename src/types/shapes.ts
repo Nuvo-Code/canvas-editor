@@ -1,13 +1,14 @@
-export type ShapeType = 
-  | 'rectangle' 
-  | 'circle' 
-  | 'triangle' 
-  | 'star' 
-  | 'polygon' 
-  | 'line' 
-  | 'arrow' 
-  | 'text' 
-  | 'image';
+export type ShapeType =
+  | 'rectangle'
+  | 'circle'
+  | 'triangle'
+  | 'star'
+  | 'polygon'
+  | 'line'
+  | 'arrow'
+  | 'text'
+  | 'image'
+  | 'clipart';
 
 export interface Shape {
   id: string;

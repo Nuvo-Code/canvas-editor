@@ -1,5 +1,5 @@
 import { Rect, Circle, RegularPolygon, Image, Text, Star, Line, Arrow } from 'react-konva';
-import type { Shape } from '@/types/shapes';
+import type { Shape } from '../../types/shapes.ts';
 
 interface ShapeRendererProps {
     shape: Shape;
@@ -32,19 +32,19 @@ export const ShapeRenderer = ({ shape, onTransformEnd, onDragEnd }: ShapeRendere
         case 'circle':
             return <Circle {...commonProps} radius={shape.radius} />;
         case 'triangle':
-            return <RegularPolygon {...commonProps} sides={3} radius={shape.radius} />;
+            return <RegularPolygon {...commonProps} sides={3} radius={shape.radius || 50} />;
         case 'polygon':
             return <RegularPolygon
                 {...commonProps}
                 sides={shape.numPoints || 6}
-                radius={shape.radius}
+                radius={shape.radius || 50}
             />;
         case 'star':
             return <Star
                 {...commonProps}
                 numPoints={shape.numPoints || 5}
                 innerRadius={shape.innerRadius || shape.radius! * 0.5}
-                outerRadius={shape.outerRadius || shape.radius}
+                outerRadius={shape.outerRadius || shape.radius || 50}
             />;
         case 'line':
             return <Line
@@ -91,12 +91,21 @@ export const ShapeRenderer = ({ shape, onTransformEnd, onDragEnd }: ShapeRendere
             /> : null;
         case 'clipart':
             // Clipart is just a special type of image
-            return shape.image instanceof HTMLImageElement ? <Image
+            if (!(shape.image instanceof HTMLImageElement)) {
+                console.error('Invalid clipart image:', shape.image);
+                return null;
+            }
+
+            // Use a more specific set of props for clipart
+            return <Image
                 {...commonProps}
                 image={shape.image}
-                width={shape.width}
-                height={shape.height}
-            /> : null;
+                width={shape.width || 100}
+                height={shape.height || 100}
+                listening={true}
+                perfectDrawEnabled={true}
+                transformsEnabled="all"
+            />;
         default:
             return null;
     }
