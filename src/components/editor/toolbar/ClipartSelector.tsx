@@ -38,9 +38,9 @@ export default function ClipartSelector({ addClipart }: ClipartSelectorProps) {
   const [selectedCategory, setSelectedCategory] = useState(clipartCategories[0].name);
 
   const handleClipartSelect = (url: string) => {
-    const img = new window.Image();
+    const img = new Image();
     img.src = url;
-    
+
     img.onload = () => {
       addClipart('clipart', {
         image: img,
@@ -53,8 +53,8 @@ export default function ClipartSelector({ addClipart }: ClipartSelectorProps) {
 
   return (
     <div className="w-80 p-2">
-      <Tabs 
-        defaultValue={clipartCategories[0].name} 
+      <Tabs
+        defaultValue={clipartCategories[0].name}
         value={selectedCategory}
         onValueChange={setSelectedCategory}
         className="w-full"
@@ -66,7 +66,7 @@ export default function ClipartSelector({ addClipart }: ClipartSelectorProps) {
             </TabsTrigger>
           ))}
         </TabsList>
-        
+
         {clipartCategories.map(category => (
           <TabsContent key={category.name} value={category.name} className="mt-4">
             <div className="grid grid-cols-3 gap-2">
@@ -77,10 +77,10 @@ export default function ClipartSelector({ addClipart }: ClipartSelectorProps) {
                   className="p-2 h-auto aspect-square flex flex-col items-center justify-center"
                   onClick={() => handleClipartSelect(item.url)}
                 >
-                  <img 
-                    src={item.url} 
-                    alt={item.label} 
-                    className="w-12 h-12 object-contain mb-1" 
+                  <img
+                    src={item.url}
+                    alt={item.label}
+                    className="w-12 h-12 object-contain mb-1"
                   />
                   <span className="text-xs">{item.label}</span>
                 </Button>

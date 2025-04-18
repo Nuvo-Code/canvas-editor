@@ -253,7 +253,7 @@ export const CanvasEditor = () => {
       </div>
 
       {/* Middle Column - Canvas */}
-      <div className="flex items-center justify-center border rounded-md bg-card shadow-md">
+      <div className="flex items-center justify-center border rounded-md bg-card shadow-md relative">
         <Stage
           width={600}
           height={600}
@@ -297,6 +297,12 @@ export const CanvasEditor = () => {
             />
           </Layer>
         </Stage>
+
+        <footer className='w-full absolute bottom-0'>
+          <div className="text-center text-xs text-muted-foreground p-2">
+            Powered by <a href="https://nuvocode.com" target="_blank">Nuvo Code</a>
+          </div>
+        </footer>
       </div>
 
       {/* Right Column - Properties, Layers, Design Area */}

@@ -83,20 +83,20 @@ export const ShapeRenderer = ({ shape, onTransformEnd, onDragEnd }: ShapeRendere
                 />
             );
         case 'image':
-            return <Image
+            return shape.image instanceof HTMLImageElement ? <Image
                 {...commonProps}
                 image={shape.image}
                 width={shape.width}
                 height={shape.height}
-            />;
+            /> : null;
         case 'clipart':
             // Clipart is just a special type of image
-            return <Image
+            return shape.image instanceof HTMLImageElement ? <Image
                 {...commonProps}
                 image={shape.image}
                 width={shape.width}
                 height={shape.height}
-            />;
+            /> : null;
         default:
             return null;
     }
