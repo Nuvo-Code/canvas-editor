@@ -105,7 +105,3 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 Nuvo Code specializes in creating innovative web applications and design tools that empower creators and businesses. Our mission is to make professional design capabilities accessible to everyone through intuitive, powerful software.
 
 [Visit our website](https://nuvocode.com) | [Contact us](mailto:info@nuvocode.com)
-
----
-
-© 2025 Nuvo Code. All rights reserved.
