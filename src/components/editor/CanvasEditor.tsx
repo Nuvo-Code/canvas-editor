@@ -341,6 +341,11 @@ export const CanvasEditor = () => {
                   toggleShapeLock(id);
                   pushState(shapes);
                 }}
+                setShapes={(newShapes) => {
+                  console.log('Setting new shapes from drag and drop:', newShapes);
+                  setShapes(newShapes);
+                  pushState(newShapes);
+                }}
               />
             </TabsContent>
           </Tabs>
@@ -402,6 +407,11 @@ export const CanvasEditor = () => {
                     onToggleLock={(id) => {
                       toggleShapeLock(id);
                       pushState(shapes);
+                    }}
+                    setShapes={(newShapes) => {
+                      console.log('Setting new shapes from mobile drawer:', newShapes);
+                      setShapes(newShapes);
+                      pushState(newShapes);
                     }}
                   />
                 </TabsContent>

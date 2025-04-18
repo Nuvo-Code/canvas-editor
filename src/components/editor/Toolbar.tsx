@@ -80,7 +80,6 @@ export const Toolbar = ({
   return (
     <div className="flex flex-col gap-3">
       <div className="space-y-2">
-        <h3 className="text-sm font-medium">Add Elements</h3>
         <div className="grid grid-cols-2 gap-2">
           <Button
             variant="outline"

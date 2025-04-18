@@ -29,7 +29,6 @@ export const MockupSelector = ({ onSelectMockup, currentMockup }: MockupSelector
 
   return (
     <div className="flex flex-col gap-2">
-      <Label htmlFor="mockup-select">Product Template</Label>
       <Select
         value={selectedMockup}
         onValueChange={handleMockupChange}
