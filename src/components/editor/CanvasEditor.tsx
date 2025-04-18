@@ -164,7 +164,9 @@ export const CanvasEditor = () => {
 
   const clearSelection = () => {
     setSelectedId(null);
-    transformerRef.current.nodes([]);
+    if (transformerRef.current) {
+      transformerRef.current.nodes([]);
+    }
   };
 
   const handleExport = (format: string, quality: number, filename: string) => {
@@ -300,13 +302,26 @@ export const CanvasEditor = () => {
 
   // Handle drag start - identify the active shape
   const handleDragStart = (e) => {
-    setActiveShape(e.target);
-    // Clear guides initially
-    setGuides({ vertical: [], horizontal: [] });
+    // Only set active shape if we're not in an input field
+    const activeElement = document.activeElement;
+    const isInputActive = activeElement && (
+      activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      activeElement.getAttribute('role') === 'textbox'
+    );
+
+    if (!isInputActive) {
+      setActiveShape(e.target);
+      // Clear guides initially
+      setGuides({ vertical: [], horizontal: [] });
+    }
   };
 
   // Handle drag move - calculate and update guides
   const handleDragMove = (e) => {
+    // Skip if no active shape (could happen if drag started in input)
+    if (!activeShape) return;
+
     // Calculate guides based on current position
     const guides = calculateGuides(e.target);
     setGuides(guides);
@@ -359,11 +374,14 @@ export const CanvasEditor = () => {
 
   // Handle drag end - clear guides and update state
   const handleDragEnd = () => {
-    // Clear guides
-    setGuides({ vertical: [], horizontal: [] });
-    setActiveShape(null);
-    // Save the state
-    pushState(shapes);
+    // Only process if we have an active shape
+    if (activeShape) {
+      // Clear guides
+      setGuides({ vertical: [], horizontal: [] });
+      setActiveShape(null);
+      // Save the state
+      pushState(shapes);
+    }
   };
 
   const handleDelete = () => {
@@ -375,6 +393,21 @@ export const CanvasEditor = () => {
   };
 
   const handleKeyDown = (e: KeyboardEvent) => {
+    // Check if the active element is an input or textarea
+    const activeElement = document.activeElement;
+    const isInputActive = activeElement && (
+      activeElement.tagName === 'INPUT' ||
+      activeElement.tagName === 'TEXTAREA' ||
+      activeElement.getAttribute('role') === 'textbox' ||
+      activeElement.isContentEditable
+    );
+
+    // If we're in an input field, don't handle keyboard shortcuts
+    if (isInputActive) {
+      return;
+    }
+
+    // Only handle specific keyboard shortcuts for the canvas
     switch (e.key) {
       case 'Escape':
         clearSelection();
@@ -458,6 +491,7 @@ export const CanvasEditor = () => {
           onClick={handleSelect}
           onTap={handleSelect}
           className='bg-gray-100 w-[600px] h-[600px] overflow-scroll rounded-lg'
+          tabIndex={-1} // Prevent stage from capturing tab focus
         >
           <Layer>
             {backgroundImage?.image && (
