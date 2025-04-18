@@ -120,7 +120,7 @@ export const Toolbar = ({
                 <span className="mt-1">Image</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent className="w-full">
               <ImageInputForm addImage={onAddShape} />
             </PopoverContent>
           </Popover>
@@ -132,7 +132,7 @@ export const Toolbar = ({
                 <span className="mt-1">Clipart</span>
               </Button>
             </PopoverTrigger>
-            <PopoverContent>
+            <PopoverContent className="w-full">
               <ClipartSelector addClipart={onAddShape} />
             </PopoverContent>
           </Popover>

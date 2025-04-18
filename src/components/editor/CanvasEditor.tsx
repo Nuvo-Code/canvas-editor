@@ -302,28 +302,11 @@ export const CanvasEditor = () => {
       {/* Right Column - Properties, Layers, Design Area */}
       <div className="flex flex-col gap-4 overflow-y-auto">
         <div className="border rounded-md bg-card shadow-md">
-          <Tabs defaultValue="properties" className="w-full p-2">
+          <Tabs defaultValue="layers" className="w-full p-2">
             <TabsList className="grid w-full grid-cols-2 top-0 bg-background z-10">
-              <TabsTrigger value="properties">Properties</TabsTrigger>
               <TabsTrigger value="layers">Layers</TabsTrigger>
+              <TabsTrigger value="properties">Properties</TabsTrigger>
             </TabsList>
-            <TabsContent value="properties" className="p-4">
-              {selectedId ? (
-                <PropertiesPanel
-                  selectedObject={shapes.find(shape => shape.id === selectedId)}
-                  onUpdate={(property, value) => {
-                    if (selectedId) {
-                      updateShape(selectedId, { [property]: value });
-                      pushState(shapes);
-                    }
-                  }}
-                />
-              ) : (
-                <div className="text-muted-foreground text-xs">
-                  Select an element to edit its properties
-                </div>
-              )}
-            </TabsContent>
             <TabsContent value="layers" className="p-4">
               <LayerPanel
                 shapes={shapes}
@@ -347,6 +330,23 @@ export const CanvasEditor = () => {
                   pushState(newShapes);
                 }}
               />
+            </TabsContent>
+            <TabsContent value="properties" className="p-4">
+              {selectedId ? (
+                <PropertiesPanel
+                  selectedObject={shapes.find(shape => shape.id === selectedId)}
+                  onUpdate={(property, value) => {
+                    if (selectedId) {
+                      updateShape(selectedId, { [property]: value });
+                      pushState(shapes);
+                    }
+                  }}
+                />
+              ) : (
+                <div className="text-muted-foreground text-xs">
+                  Select an element to edit its properties
+                </div>
+              )}
             </TabsContent>
           </Tabs>
         </div>
