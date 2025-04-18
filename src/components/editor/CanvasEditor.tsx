@@ -5,6 +5,13 @@ import { useHistory } from '@/hooks/useHistory';
 import { ShapeRenderer } from './ShapeRenderer';
 import { Toolbar } from './Toolbar';
 import { PropertiesPanel } from './PropertiesPanel';
+import { MockupSelector } from './MockupSelector';
+import { LayerPanel } from './LayerPanel';
+
+import { ExportDialog } from './ExportDialog';
+import { DesignableArea } from './DesignableArea';
+import { DesignableAreaControls } from './DesignableAreaControls';
+import { ProductOptions } from './ProductOptions';
 import { Button } from '@/components/ui/button'
 import {
   Drawer,
@@ -16,18 +23,32 @@ import {
 } from "@/components/ui/drawer"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
-import { tshirt } from '@/lib/mockups';
+import { tshirt, allMockups } from '@/lib/mockups';
+import type { MockupProps } from '@/types/mockups';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
 
 export const CanvasEditor = () => {
   const [backgroundImage, setBackgroundImage] = useState(tshirt());
+  // Fixed designable area - not editable
+  const designableArea = {
+    x: 150,  // Center of the 600x600 canvas, minus half the size
+    y: 150,
+    size: 300  // Size of the square designable area
+  };
+
   const {
     shapes,
+    setShapes,
     selectedId,
     setSelectedId,
     getSelectedShape,
     addShape,
     updateShape,
-    deleteShape
+    deleteShape,
+    moveLayer,
+    toggleShapeVisibility,
+    toggleShapeLock
   } = useShapeManager();
 
   const {
@@ -35,25 +56,82 @@ export const CanvasEditor = () => {
     undo,
     redo,
     canUndo,
-    canRedo
+    canRedo,
+    currentState
   } = useHistory(shapes);
+
+  // Sync shapes with history
+  useEffect(() => {
+    if (currentState && currentState !== shapes) {
+      setShapes(currentState);
+    }
+  }, [currentState]);
 
   const backgroundImageRef = useRef(null);
   const stageRef = useRef(null);
   const transformerRef = useRef(null);
 
   const handleShapeAdd = (type: string, properties = {}) => {
-    const newShape = addShape(type, properties);
+    // Set initial position to center of designable area
+    const centerX = designableArea.x + (designableArea.size / 2);
+    const centerY = designableArea.y + (designableArea.size / 2);
+
+    // Estimate the size of the new shape
+    const width = properties.width || (properties.radius ? properties.radius * 2 : 100);
+    const height = properties.height || (properties.radius ? properties.radius * 2 : 100);
+
+    // Calculate position so shape is centered in designable area
+    const x = centerX - (width / 2);
+    const y = centerY - (height / 2);
+
+    // Create the new shape with constrained position
+    const newShape = addShape(type, { ...properties, x, y });
     pushState([...shapes, newShape]);
+  };
+
+  // Keep elements within the designable area
+  const constrainToDesignArea = (x, y, width, height) => {
+    const designLeft = designableArea.x;
+    const designRight = designableArea.x + designableArea.size;
+    const designTop = designableArea.y;
+    const designBottom = designableArea.y + designableArea.size;
+
+    // Constrain x position
+    let newX = x;
+    if (x < designLeft) newX = designLeft;
+    if (x + width > designRight) newX = designRight - width;
+
+    // Constrain y position
+    let newY = y;
+    if (y < designTop) newY = designTop;
+    if (y + height > designBottom) newY = designBottom - height;
+
+    return { x: newX, y: newY };
   };
 
   const handleTransformEnd = (e) => {
     const node = e.target;
     const id = node.id();
+    const shape = shapes.find(s => s.id === id);
+
+    if (!shape) return;
+
+    // Get the new position and dimensions
+    const newX = node.x();
+    const newY = node.y();
+    const width = node.width ? node.width() : (shape.radius ? shape.radius * 2 : 100);
+    const height = node.height ? node.height() : (shape.radius ? shape.radius * 2 : 100);
+
+    // Constrain to design area
+    const { x, y } = constrainToDesignArea(newX, newY, width, height);
+
     const updates = {
-      x: node.x(),
-      y: node.y(),
-      rotation: node.rotation()
+      x,
+      y,
+      rotation: node.rotation(),
+      ...(node.width && { width: node.width() }),
+      ...(node.height && { height: node.height() }),
+      ...(node.radius && { radius: node.radius() })
     };
 
     updateShape(id, updates);
@@ -73,13 +151,17 @@ export const CanvasEditor = () => {
     transformerRef.current.nodes([]);
   };
 
-  const handleExport = () => {
+  const handleExport = (format: string, quality: number, filename: string) => {
     if (stageRef.current) {
-      const dataURL = stageRef.current.toDataURL();
+      const dataURL = stageRef.current.toDataURL({
+        mimeType: format === 'jpeg' ? 'image/jpeg' : 'image/png',
+        quality: format === 'jpeg' ? quality / 100 : 1,
+        pixelRatio: 2 // Higher resolution
+      });
 
       const link = document.createElement("a");
       link.href = dataURL;
-      link.download = "konva-image.png";
+      link.download = `${filename}.${format}`;
       document.body.appendChild(link);
       link.click();
       document.body.removeChild(link);
@@ -123,98 +205,213 @@ export const CanvasEditor = () => {
     return () => document.removeEventListener('keydown', handleKeyDown);
   }, [selectedId]);
 
+  const handleMockupChange = (mockup: MockupProps) => {
+    setBackgroundImage(mockup);
+  };
+
+
+
+
+
   return (
-    <div className="flex flex-col p-4 gap-4 h-screen">
-      <div className='flex justify-between items-center gap-4'>
-        <Toolbar
-          selectedObject={getSelectedShape()}
-          onAddShape={handleShapeAdd}
-          onDelete={() => handleDelete()}
-          onSave={() => handleExport()}
-          onUndo={undo}
-          onRedo={redo}
-          canUndo={canUndo}
-          canRedo={canRedo}
-        />
+    <div className="grid grid-cols-1 md:grid-cols-[300px_1fr_300px] gap-4 h-screen p-4">
+      {/* Left Column - Tools */}
+      <div className="border rounded-md p-4 overflow-y-auto">
+        <div className="space-y-4">
+          <h2 className="text-lg font-medium">Design Tools</h2>
+
+          <Toolbar
+            selectedObject={getSelectedShape()}
+            onAddShape={handleShapeAdd}
+            onDelete={() => handleDelete()}
+            onUndo={undo}
+            onRedo={redo}
+            canUndo={canUndo}
+            canRedo={canRedo}
+          />
+
+          <div className="pt-4 border-t">
+            <h3 className="text-md font-medium mb-2">Product</h3>
+            <MockupSelector
+              onSelectMockup={handleMockupChange}
+              currentMockup={backgroundImage.name}
+            />
+          </div>
+
+          <div className="pt-4 border-t">
+            <h3 className="text-md font-medium mb-2">Actions</h3>
+            <div className="flex flex-col gap-2">
+
+              <ExportDialog onExport={handleExport} />
+            </div>
+          </div>
+        </div>
+      </div>
+
+      {/* Middle Column - Canvas */}
+      <div className="flex items-center justify-center border rounded-md">
+        <Stage
+          width={600}
+          height={600}
+          ref={stageRef}
+          onClick={handleSelect}
+          onTap={handleSelect}
+          className='bg-gray-100 w-[600px] h-[600px] overflow-scroll rounded-lg'
+        >
+          <Layer>
+            {backgroundImage?.image && (
+              <Image
+                ref={backgroundImageRef}
+                image={backgroundImage.image}
+                width={600}
+                height={600}
+              />
+            )}
+
+            {/* Designable area with dotted border */}
+            <DesignableArea
+              x={designableArea.x}
+              y={designableArea.y}
+              size={designableArea.size}
+            />
+
+            {shapes.map(shape => (
+              <ShapeRenderer
+                key={shape.id}
+                shape={shape}
+                onTransformEnd={handleTransformEnd}
+                onDragEnd={() => pushState(shapes)}
+              />
+            ))}
+
+            <Transformer
+              enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
+              ref={transformerRef}
+              boundBoxFunc={(oldBox, newBox) => {
+                return newBox.width < 5 || newBox.height < 5 ? oldBox : newBox;
+              }}
+            />
+          </Layer>
+        </Stage>
+      </div>
+
+      {/* Right Column - Properties, Layers, Design Area */}
+      <div className="flex flex-col gap-4 overflow-y-auto">
+        <div className="border rounded-md">
+          <Tabs defaultValue="properties" className="w-full">
+            <TabsList className="grid w-full grid-cols-2 sticky top-0 bg-background z-10">
+              <TabsTrigger value="properties">Properties</TabsTrigger>
+              <TabsTrigger value="layers">Layers</TabsTrigger>
+            </TabsList>
+            <TabsContent value="properties" className="p-4">
+              {selectedId ? (
+                <PropertiesPanel
+                  selectedObject={shapes.find(shape => shape.id === selectedId)}
+                  onUpdate={(property, value) => {
+                    if (selectedId) {
+                      updateShape(selectedId, { [property]: value });
+                      pushState(shapes);
+                    }
+                  }}
+                />
+              ) : (
+                <div className="text-center py-8 text-muted-foreground">
+                  Select an element to edit its properties
+                </div>
+              )}
+            </TabsContent>
+            <TabsContent value="layers" className="p-4">
+              <LayerPanel
+                shapes={shapes}
+                selectedId={selectedId}
+                onSelectShape={(id) => setSelectedId(id)}
+                onMoveLayer={(id, direction) => {
+                  moveLayer(id, direction);
+                  pushState(shapes);
+                }}
+                onToggleVisibility={(id) => {
+                  toggleShapeVisibility(id);
+                  pushState(shapes);
+                }}
+                onToggleLock={(id) => {
+                  toggleShapeLock(id);
+                  pushState(shapes);
+                }}
+              />
+            </TabsContent>
+          </Tabs>
+        </div>
+
+        {/* Product Options Section */}
+        <div className="border rounded-md">
+          <ProductOptions
+            productName={`Custom ${backgroundImage.name}`}
+            price={24.99}
+          />
+        </div>
+      </div>
+
+      {/* Mobile Drawer - Only visible on small screens */}
+      <div className="md:hidden fixed bottom-4 right-4 z-10">
         <Drawer>
           <DrawerTrigger asChild>
-            <Button variant='outline' size="icon" className='h-full w-12 md:hidden'>
+            <Button variant='outline' size="icon" className='h-12 w-12 rounded-full shadow-lg'>
               <FontAwesomeIcon icon={faGear} size='lg' />
             </Button>
           </DrawerTrigger>
           <DrawerContent>
-            <DrawerHeader className="hidden">
+            <DrawerHeader>
               <DrawerTitle>Properties</DrawerTitle>
-              <DrawerDescription>Properties panel</DrawerDescription>
+              <DrawerDescription>Edit selected element properties</DrawerDescription>
             </DrawerHeader>
 
             <div className='px-4 py-2'>
-              <PropertiesPanel
-                selectedObject={shapes.find(shape => shape.id === selectedId)}
-                onUpdate={(property, value) => {
-                  if (selectedId) {
-                    updateShape(selectedId, { [property]: value });
-                    pushState(shapes);
-                  }
-                }}
-              />
+              <Tabs defaultValue="properties" className="w-full">
+                <TabsList className="grid w-full grid-cols-2">
+                  <TabsTrigger value="properties">Properties</TabsTrigger>
+                  <TabsTrigger value="layers">Layers</TabsTrigger>
+                </TabsList>
+                <TabsContent value="properties" className="mt-4">
+                  <PropertiesPanel
+                    selectedObject={shapes.find(shape => shape.id === selectedId)}
+                    onUpdate={(property, value) => {
+                      if (selectedId) {
+                        updateShape(selectedId, { [property]: value });
+                        pushState(shapes);
+                      }
+                    }}
+                  />
+                </TabsContent>
+                <TabsContent value="layers" className="mt-4">
+                  <LayerPanel
+                    shapes={shapes}
+                    selectedId={selectedId}
+                    onSelectShape={(id) => setSelectedId(id)}
+                    onMoveLayer={(id, direction) => {
+                      moveLayer(id, direction);
+                      pushState(shapes);
+                    }}
+                    onToggleVisibility={(id) => {
+                      toggleShapeVisibility(id);
+                      pushState(shapes);
+                    }}
+                    onToggleLock={(id) => {
+                      toggleShapeLock(id);
+                      pushState(shapes);
+                    }}
+                  />
+                </TabsContent>
+              </Tabs>
+
+              <div className="mt-4 pt-4 border-t">
+                <ProductOptions
+                  productName={`Custom ${backgroundImage.name}`}
+                  price={24.99}
+                />
+              </div>
             </div>
           </DrawerContent>
         </Drawer>
-
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-5 gap-4 h-full">
-        <div className="md:col-span-4 flex items-center justify-center border shadow rounded-md">
-          <Stage
-            width={600}
-            height={600}
-            ref={stageRef}
-            onClick={handleSelect}
-            onTap={handleSelect}
-            className='bg-gray-100 w-[600px] h-[600px] overflow-scroll rounded-lg'
-          >
-            <Layer>
-              {backgroundImage?.image && (
-                <Image
-                  ref={backgroundImageRef}
-                  image={backgroundImage.image}
-                  width={600}
-                  height={600}
-                />
-              )}
-
-              {shapes.map(shape => (
-                <ShapeRenderer
-                  key={shape.id}
-                  shape={shape}
-                  onTransformEnd={handleTransformEnd}
-                  onDragEnd={() => pushState(shapes)}
-                />
-              ))}
-
-              <Transformer
-                enabledAnchors={['top-left', 'top-right', 'bottom-left', 'bottom-right']}
-                ref={transformerRef}
-                boundBoxFunc={(oldBox, newBox) => {
-                  return newBox.width < 5 || newBox.height < 5 ? oldBox : newBox;
-                }}
-              />
-            </Layer>
-          </Stage>
-        </div>
-
-        <div className='hidden md:block'>
-          <PropertiesPanel
-            selectedObject={shapes.find(shape => shape.id === selectedId)}
-            onUpdate={(property, value) => {
-              if (selectedId) {
-                updateShape(selectedId, { [property]: value });
-                pushState(shapes);
-              }
-            }}
-          />
-        </div>
       </div>
     </div>
   );
