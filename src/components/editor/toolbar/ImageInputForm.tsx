@@ -19,10 +19,29 @@ export default function ImageInputForm({ addImage }: ImageInputFormProps) {
             img.src = imageUrl;
 
             img.onload = () => {
+                // Calculate aspect ratio to maintain proportions
+                const aspectRatio = img.width / img.height;
+
+                // Set a target size that fits well within the design area
+                // while preserving the aspect ratio
+                let width, height;
+
+                // For landscape or square images (width >= height)
+                if (aspectRatio >= 1) {
+                    width = Math.min(200, img.width); // Cap width at 200px or original size
+                    height = width / aspectRatio;
+                }
+                // For portrait images (height > width)
+                else {
+                    height = Math.min(200, img.height); // Cap height at 200px or original size
+                    width = height * aspectRatio;
+                }
+
                 addImage('image', {
                     image: img,
-                    width: 150,
-                    height: 150
+                    width,
+                    height,
+                    aspectRatio // Store the aspect ratio for future reference
                 });
                 setImageUrl("");
             };
