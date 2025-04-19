@@ -1,20 +1,15 @@
 import { useState } from 'react'
-import type { ShapeType, ToolbarProps } from '@/types/shapes'
-import { Button } from '@/components/ui/button'
-import {
-  Tooltip,
-  TooltipContent,
-  TooltipTrigger,
-} from '@/components/ui/tooltip'
+import type { ShapeType, ToolbarProps } from '../../types/shapes'
+import { Button } from '../../components/ui/button'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
+} from '../../components/ui/popover'
+import { Input } from '../../components/ui/input'
+import { Label } from '../../components/ui/label'
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
-import { faTriangleCircleSquare, faFileText, faTrash, faPaintBrush, faImage, faSmile } from '@fortawesome/free-solid-svg-icons'
+import { faTriangleCircleSquare, faFileText, faTrash, faImage, faSmile } from '@fortawesome/free-solid-svg-icons'
 import ImageInputForm from './toolbar/ImageInputForm'
 import ClipartSelector from './toolbar/ClipartSelector'
 
@@ -162,13 +157,13 @@ export const Toolbar = ({
                   type="color"
                   id="color"
                   value={selectedColor}
-                  onChange={(e) => setSelectedColor(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedColor(e.target.value)}
                   className="w-[60px] h-[40px] p-1"
                 />
                 <Input
                   type="text"
                   value={selectedColor}
-                  onChange={(e) => setSelectedColor(e.target.value)}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSelectedColor(e.target.value)}
                   className="flex-1"
                 />
               </div>

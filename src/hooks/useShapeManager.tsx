@@ -1,6 +1,6 @@
 import { useState } from 'react';
-import { generateId } from '@/lib/utils';
-import type { Shape, ShapeType } from '@/types/shapes';
+import { generateId } from '../lib/utils';
+import type { Shape, ShapeType } from '../types/shapes';
 
 export function useShapeManager() {
     const [shapes, setShapes] = useState<Shape[]>([]);

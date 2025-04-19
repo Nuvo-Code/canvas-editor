@@ -1,5 +1,4 @@
-import type { Shape } from '@/types/shapes';
-import type { MockupProps } from '@/types/mockups';
+import type { Shape } from '../types/shapes';
 
 export interface SavedDesign {
   id: string;

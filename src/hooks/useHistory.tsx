@@ -1,5 +1,5 @@
-import { useState, useEffect } from 'react';
-import type { Shape } from '@/types/shapes';
+import { useState } from 'react';
+import type { Shape } from '../types/shapes';
 
 export function useHistory(initialState: Shape[] = []) {
     // Initialize history with a properly cloned version of the initial state

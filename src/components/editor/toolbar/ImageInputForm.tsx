@@ -1,8 +1,8 @@
 import { useState } from "react";
-import { Input } from "@/components/ui/input";
-import { Button } from "@/components/ui/button";
-import { Label } from "@/components/ui/label";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Input } from "../../../components/ui/input";
+import { Button } from "../../../components/ui/button";
+import { Label } from "../../../components/ui/label";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui/tabs";
 import LocalImageUpload from "./LocalImageUpload";
 
 interface ImageInputFormProps {
@@ -64,7 +64,7 @@ export default function ImageInputForm({ addImage }: ImageInputFormProps) {
                                 type="text"
                                 placeholder="Enter image URL"
                                 value={imageUrl}
-                                onChange={(e) => setImageUrl(e.target.value)}
+                                onChange={(e: React.ChangeEvent<HTMLInputElement>) => setImageUrl(e.target.value)}
                             />
                         </div>
                         <Button type="submit" className="w-full">Add Image</Button>
