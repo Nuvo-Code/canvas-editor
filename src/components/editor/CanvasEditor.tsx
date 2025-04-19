@@ -571,7 +571,7 @@ export const CanvasEditor = () => {
       </div>
 
       {/* Middle Column - Canvas */}
-      <div className="flex items-center justify-center border rounded-md bg-card shadow-md relative">
+      <div className="flex items-center justify-center border rounded-md bg-card relative">
         <Stage
           width={600}
           height={600}
@@ -638,7 +638,7 @@ export const CanvasEditor = () => {
 
       {/* Right Column - Properties, Layers, Design Area */}
       <div className="flex flex-col gap-4 overflow-y-auto">
-        <div className="border rounded-md bg-card shadow-md">
+        <div className="border rounded-md bg-card">
           <Tabs defaultValue="layers" className="w-full p-2">
             <TabsList className="grid w-full grid-cols-2 top-0 bg-background z-10">
               <TabsTrigger value="layers">Layers</TabsTrigger>
@@ -690,7 +690,7 @@ export const CanvasEditor = () => {
         {/* Designable Area Controls */}
         {
           designableAreaVisible &&
-          <div className="border rounded-md bg-card shadow-md">
+          <div className="rounded-md bg-card">
             <DesignableAreaControls
               x={designableArea.x}
               y={designableArea.y}
@@ -702,7 +702,7 @@ export const CanvasEditor = () => {
         }
 
         {/* Product Options Section */}
-        <div className="border rounded-md bg-card shadow-md mt-4">
+        <div className="rounded-md bg-card mt-4">
           <ProductOptions
             productName={`Custom ${backgroundImage.name}`}
             price={24.99}
