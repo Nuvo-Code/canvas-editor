@@ -173,9 +173,16 @@ export const CanvasEditor = () => {
 
   const handleExport = (format: string, quality: number, filename: string, exportType: ExportType) => {
     if (stageRef.current) {
-      // Store original visibility states
+      // Store original states
       const designableAreaVisible = designableAreaRef.current?.visible();
       const backgroundVisible = backgroundImageRef.current?.visible();
+      const originalSelectedId = selectedId;
+
+      // Temporarily clear selection to avoid showing selection guidelines in export
+      if (transformerRef.current) {
+        transformerRef.current.nodes([]);
+      }
+      setSelectedId(null);
 
       // Apply visibility changes based on export type
       if ((exportType === 'no-dots' || exportType === 'no-background') && designableAreaRef.current) {
@@ -188,6 +195,9 @@ export const CanvasEditor = () => {
 
       // Get the configured export resolution
       const pixelRatio = getExportPixelRatio();
+
+      // Force a redraw to ensure selection is cleared in the exported image
+      stageRef.current.batchDraw();
 
       let dataURL;
 
@@ -225,6 +235,11 @@ export const CanvasEditor = () => {
 
       if (backgroundImageRef.current) {
         backgroundImageRef.current.visible(backgroundVisible);
+      }
+
+      // Restore original selection if there was one
+      if (originalSelectedId) {
+        setSelectedId(originalSelectedId);
       }
 
       // Trigger download
