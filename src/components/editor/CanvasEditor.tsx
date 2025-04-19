@@ -25,6 +25,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { tshirt, allMockups } from '@/lib/mockups';
+import { getExportPixelRatio } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import type { MockupProps } from '@/types/mockups';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -185,11 +186,14 @@ export const CanvasEditor = () => {
         backgroundImageRef.current.visible(false);
       }
 
+      // Get the configured export resolution
+      const pixelRatio = getExportPixelRatio();
+
       // Generate the image
       const dataURL = stageRef.current.toDataURL({
         mimeType: format === 'jpeg' ? 'image/jpeg' : 'image/png',
         quality: format === 'jpeg' ? quality / 100 : 1,
-        pixelRatio: 2 // Higher resolution
+        pixelRatio // Use the configured resolution
       });
 
       // Restore original visibility

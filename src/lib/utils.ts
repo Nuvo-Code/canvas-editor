@@ -98,7 +98,7 @@ export const formatColor = (color: string): string => {
 
 /**
  * Gets the center point of a shape based on its position and dimensions
- * @param {{x: number, y: number, width?: number, height?: number, radius?: number}} shape 
+ * @param {{x: number, y: number, width?: number, height?: number, radius?: number}} shape
  * @returns {{x: number, y: number}} The center point coordinates
  */
 export const getShapeCenter = (shape: {
@@ -123,4 +123,16 @@ export const getShapeCenter = (shape: {
   }
 
   return { x: shape.x, y: shape.y };
+};
+
+/**
+ * Gets the export pixel ratio from environment variables
+ * @returns {number} The pixel ratio to use for exports
+ */
+export const getExportPixelRatio = (): number => {
+  const envRatio = import.meta.env.VITE_EXPORT_PIXEL_RATIO;
+  if (envRatio && !isNaN(Number(envRatio))) {
+    return Number(envRatio);
+  }
+  return 2; // Default fallback value
 };
