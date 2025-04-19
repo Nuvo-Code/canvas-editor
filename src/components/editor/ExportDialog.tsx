@@ -78,19 +78,33 @@ export function ExportDialog({ onExport }: ExportDialogProps) {
 
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Export Type</Label>
-            <Select
-              value={exportType}
-              onValueChange={(value: ExportType) => setExportType(value)}
-            >
-              <SelectTrigger className="col-span-3">
-                <SelectValue placeholder="Select export type" />
-              </SelectTrigger>
-              <SelectContent>
-                <SelectItem value="complete">Complete Design</SelectItem>
-                <SelectItem value="no-dots">Without Designable Area Dots</SelectItem>
-                <SelectItem value="no-background">Without Background & Dots</SelectItem>
-              </SelectContent>
-            </Select>
+            <div className="col-span-3 space-y-4">
+              <Select
+                value={exportType}
+                onValueChange={(value: ExportType) => setExportType(value)}
+              >
+                <SelectTrigger>
+                  <SelectValue placeholder="Select export type" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="complete">Complete Design</SelectItem>
+                  <SelectItem value="no-dots">Without Designable Area Dots</SelectItem>
+                  <SelectItem value="no-background">Cropped Design Only</SelectItem>
+                </SelectContent>
+              </Select>
+
+              <div className="text-xs text-muted-foreground">
+                {exportType === 'complete' && (
+                  <p>Exports the entire design including the product background and designable area border.</p>
+                )}
+                {exportType === 'no-dots' && (
+                  <p>Exports the design with the product background but without the designable area border.</p>
+                )}
+                {exportType === 'no-background' && (
+                  <p>Exports only the content within the designable area, cropped to the design area boundaries.</p>
+                )}
+              </div>
+            </div>
           </div>
 
           {format === 'jpeg' && (

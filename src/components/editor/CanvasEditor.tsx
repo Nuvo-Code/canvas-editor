@@ -189,12 +189,34 @@ export const CanvasEditor = () => {
       // Get the configured export resolution
       const pixelRatio = getExportPixelRatio();
 
-      // Generate the image
-      const dataURL = stageRef.current.toDataURL({
-        mimeType: format === 'jpeg' ? 'image/jpeg' : 'image/png',
-        quality: format === 'jpeg' ? quality / 100 : 1,
-        pixelRatio // Use the configured resolution
-      });
+      let dataURL;
+
+      // For 'no-background' export type, crop to just the designable area
+      if (exportType === 'no-background') {
+        // Calculate crop dimensions based on designable area
+        const cropX = designableArea.x;
+        const cropY = designableArea.y;
+        const cropWidth = designableArea.size;
+        const cropHeight = designableArea.size;
+
+        // Generate the image with cropping
+        dataURL = stageRef.current.toDataURL({
+          mimeType: format === 'jpeg' ? 'image/jpeg' : 'image/png',
+          quality: format === 'jpeg' ? quality / 100 : 1,
+          pixelRatio,
+          x: cropX,
+          y: cropY,
+          width: cropWidth,
+          height: cropHeight
+        });
+      } else {
+        // Generate the full image for other export types
+        dataURL = stageRef.current.toDataURL({
+          mimeType: format === 'jpeg' ? 'image/jpeg' : 'image/png',
+          quality: format === 'jpeg' ? quality / 100 : 1,
+          pixelRatio
+        });
+      }
 
       // Restore original visibility
       if (designableAreaRef.current) {
