@@ -4,7 +4,7 @@ import { Input } from "../../../components/ui/input";
 import { Label } from "../../../components/ui/label";
 
 interface LocalImageUploadProps {
-  addImage: (type: string, properties: any) => void;
+  addImage: (type: 'image', properties: { image: HTMLImageElement; width: number; height: number; aspectRatio: number }) => void;
 }
 
 export default function LocalImageUpload({ addImage }: LocalImageUploadProps) {

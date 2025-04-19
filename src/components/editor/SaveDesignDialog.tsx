@@ -1,7 +1,7 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
 import {
   Dialog,
   DialogContent,
@@ -10,9 +10,9 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { saveDesign } from '@/lib/storage';
-import type { Shape } from '@/types/shapes';
+} from '../../components/ui/dialog';
+import { saveDesign } from '../../lib/storage';
+import type { Shape } from '../../types/shapes';
 
 interface SaveDesignDialogProps {
   shapes: Shape[];
@@ -63,7 +63,7 @@ export function SaveDesignDialog({ shapes, mockupName, onSave }: SaveDesignDialo
             <Input
               id="name"
               value={designName}
-              onChange={(e) => setDesignName(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setDesignName(e.target.value)}
               className="col-span-3"
               placeholder="My Awesome Design"
             />

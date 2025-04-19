@@ -1,8 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
 import { Stage, Layer, Transformer, Image } from 'react-konva';
 import AlignmentGuides from './AlignmentGuides';
-import { useShapeManager } from '@/hooks/useShapeManager';
-import { useHistory } from '@/hooks/useHistory';
+import { useShapeManager } from '../../hooks/useShapeManager';
+import { useHistory } from '../../hooks/useHistory';
 import { ShapeRenderer } from './ShapeRenderer';
 import { Toolbar } from './Toolbar';
 import { PropertiesPanel } from './PropertiesPanel';
@@ -13,7 +13,7 @@ import { ExportDialog, ExportType } from './ExportDialog';
 import { DesignableArea } from './DesignableArea';
 import { DesignableAreaControls } from './DesignableAreaControls';
 import { ProductOptions } from './ProductOptions';
-import { Button } from '@/components/ui/button'
+import { Button } from '../../components/ui/button'
 import {
   Drawer,
   DrawerContent,
@@ -21,14 +21,16 @@ import {
   DrawerHeader,
   DrawerTitle,
   DrawerTrigger,
-} from "@/components/ui/drawer"
+} from "../../components/ui/drawer"
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
-import { tshirt, allMockups } from '@/lib/mockups';
-import { getExportPixelRatio, getDesignableAreaConfig } from '@/lib/utils';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
-import type { MockupProps } from '@/types/mockups';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { tshirt } from '../../lib/mockups';
+import { getExportPixelRatio, getDesignableAreaConfig } from '../../lib/utils';
+import { ThemeToggle } from '../../components/ui/theme-toggle';
+import type { MockupProps } from '../../types/mockups';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../components/ui/tabs";
+import Konva from 'konva';
+import { ShapeType } from '../../types/shapes';
 
 
 export const CanvasEditor = () => {
@@ -77,17 +79,25 @@ export const CanvasEditor = () => {
     }
   }, [currentState]);
 
-  const backgroundImageRef = useRef(null);
-  const designableAreaRef = useRef(null);
-  const stageRef = useRef(null);
-  const transformerRef = useRef(null);
+  const backgroundImageRef = useRef<Konva.Image>(null);
+  const designableAreaRef = useRef<Konva.Rect>(null);
+  const stageRef = useRef<Konva.Stage>(null);
+  const transformerRef = useRef<Konva.Transformer>(null);
 
   // State for alignment guides
-  const [guides, setGuides] = useState({ vertical: [], horizontal: [] });
+  const [guides, setGuides] = useState<{ vertical: any[]; horizontal: any[] }>({ vertical: [], horizontal: [] });
   const [activeShape, setActiveShape] = useState(null);
   const SNAP_THRESHOLD = 10; // Distance in pixels to trigger snapping
 
-  const handleShapeAdd = (type: string, properties = {}) => {
+  interface ShapeProperties {
+    image?: HTMLImageElement;
+    width?: number;
+    height?: number;
+    radius?: number;
+    [key: string]: any; // Allow additional properties
+  }
+
+  const handleShapeAdd = (type: ShapeType, properties: ShapeProperties = {}) => {
     // Set initial position to center of designable area
     const centerX = designableArea.x + (designableArea.width / 2);
     const centerY = designableArea.y + (designableArea.height / 2);
@@ -115,7 +125,7 @@ export const CanvasEditor = () => {
   };
 
   // Keep elements within the designable area
-  const constrainToDesignArea = (x, y, width, height) => {
+  const constrainToDesignArea = (x: number, y: number, width: number, height: number) => {
     const designLeft = designableArea.x;
     const designRight = designableArea.x + designableArea.width;
     const designTop = designableArea.y;
@@ -134,10 +144,10 @@ export const CanvasEditor = () => {
     return { x: newX, y: newY };
   };
 
-  const handleTransformEnd = (e) => {
+  const handleTransformEnd = (e: any) => {
     const node = e.target;
     const id = node.id();
-    const shape = shapes.find(s => s.id === id);
+    const shape = shapes.find((s: any) => s.id === id);
 
     if (!shape) return;
 
@@ -163,7 +173,7 @@ export const CanvasEditor = () => {
     pushState(shapes);
   };
 
-  const handleSelect = (e) => {
+  const handleSelect = (e: any) => {
     const clickedOnEmpty = e.target === e.target.getStage();
     setSelectedId(clickedOnEmpty ? null : e.target.id());
     if (clickedOnEmpty) {
@@ -261,7 +271,7 @@ export const CanvasEditor = () => {
   };
 
   // Calculate alignment guides for the active shape
-  const calculateGuides = (activeNode) => {
+  const calculateGuides = (activeNode: any) => {
     if (!activeNode) return { vertical: [], horizontal: [] };
 
     // Get active shape dimensions
@@ -313,7 +323,7 @@ export const CanvasEditor = () => {
     }
 
     // Check for alignment with other shapes
-    shapes.forEach(shape => {
+    shapes.forEach((shape: any) => {
       // Skip the active shape itself
       if (shape.id === activeNode.id()) return;
       if (shape.visible === false) return;
@@ -375,7 +385,7 @@ export const CanvasEditor = () => {
   };
 
   // Handle drag start - identify the active shape
-  const handleDragStart = (e) => {
+  const handleDragStart = (e: any) => {
     // Only set active shape if we're not in an input field
     const activeElement = document.activeElement;
     const isInputActive = activeElement && (
@@ -392,7 +402,7 @@ export const CanvasEditor = () => {
   };
 
   // Handle drag move - calculate and update guides
-  const handleDragMove = (e) => {
+  const handleDragMove = (e: any) => {
     // Skip if no active shape (could happen if drag started in input)
     if (!activeShape) return;
 
@@ -473,7 +483,7 @@ export const CanvasEditor = () => {
       activeElement.tagName === 'INPUT' ||
       activeElement.tagName === 'TEXTAREA' ||
       activeElement.getAttribute('role') === 'textbox' ||
-      activeElement.isContentEditable
+      (activeElement as HTMLElement).isContentEditable
     );
 
     // If we're in an input field, don't handle keyboard shortcuts
@@ -497,10 +507,13 @@ export const CanvasEditor = () => {
 
   useEffect(() => {
     if (selectedId && transformerRef.current) {
-      const node = transformerRef.current.getStage().findOne('#' + selectedId);
-      if (node) {
-        transformerRef.current.nodes([node]);
-        transformerRef.current.getLayer().batchDraw();
+      const transformer = transformerRef.current;
+      if (transformer) {
+        const node = transformer.getStage()?.findOne('#' + selectedId);
+        if (node) {
+          transformer.nodes([node]);
+          transformer.getLayer()?.batchDraw();
+        }
       }
     } else {
       clearSelection();
@@ -608,7 +621,7 @@ export const CanvasEditor = () => {
               guides={guides}
             />
 
-            {shapes.map(shape => (
+            {shapes.map((shape: any) => (
               <ShapeRenderer
                 key={shape.id}
                 shape={shape}
@@ -670,7 +683,7 @@ export const CanvasEditor = () => {
             <TabsContent value="properties" className="p-4">
               {selectedId ? (
                 <PropertiesPanel
-                  selectedObject={shapes.find(shape => shape.id === selectedId)}
+                  selectedObject={shapes.find((shape: any) => shape.id === selectedId)}
                   onUpdate={(property, value) => {
                     if (selectedId) {
                       updateShape(selectedId, { [property]: value });
@@ -732,7 +745,7 @@ export const CanvasEditor = () => {
                 </TabsList>
                 <TabsContent value="properties" className="mt-4">
                   <PropertiesPanel
-                    selectedObject={shapes.find(shape => shape.id === selectedId)}
+                    selectedObject={shapes.find((shape: any) => shape.id === selectedId)}
                     onUpdate={(property, value) => {
                       if (selectedId) {
                         updateShape(selectedId, { [property]: value });

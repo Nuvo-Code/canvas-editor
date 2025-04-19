@@ -1,8 +1,8 @@
-import React, { useState, useRef } from 'react';
-import { Button } from '@/components/ui/button';
+import React, { useState } from 'react';
+import { Button } from '../../components/ui/button';
+import type { Shape } from '../../types/shapes';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEye, faEyeSlash, faLock, faLockOpen, faArrowUp, faArrowDown, faGripVertical } from '@fortawesome/free-solid-svg-icons';
-import type { Shape } from '@/types/shapes';
 
 interface LayerPanelProps {
   shapes: Shape[];

@@ -1,10 +1,10 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Label } from '@/components/ui/label';
-import { Slider } from '@/components/ui/slider';
-import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Label } from '../../components/ui/label';
+import { Slider } from '../../components/ui/slider';
+import { RadioGroup, RadioGroupItem } from '../../components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '../../components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -13,7 +13,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
+} from '../../components/ui/dialog';
 
 export type ExportType = 'complete' | 'no-dots' | 'no-background';
 
@@ -53,7 +53,7 @@ export function ExportDialog({ onExport }: ExportDialogProps) {
             <Input
               id="filename"
               value={filename}
-              onChange={(e) => setFilename(e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => setFilename(e.target.value)}
               className="col-span-3"
             />
           </div>
@@ -116,7 +116,7 @@ export function ExportDialog({ onExport }: ExportDialogProps) {
                   max={100}
                   step={1}
                   value={[quality]}
-                  onValueChange={([value]) => setQuality(value)}
+                  onValueChange={([value]: any) => setQuality(value)}
                 />
                 <div className="flex justify-between text-xs text-muted-foreground">
                   <span>Low</span>

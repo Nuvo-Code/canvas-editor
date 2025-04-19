@@ -1,8 +1,8 @@
 import { useState } from 'react';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
-import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '@/components/ui/table';
+import { Button } from '../../components/ui/button';
+import { Input } from '../../components/ui/input';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '../../components/ui/card';
+import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '../../components/ui/table';
 import { Minus, Plus, ShoppingCart } from 'lucide-react';
 
 // Sample size options - these would typically come from your product database
@@ -120,7 +120,7 @@ export const ProductOptions = ({ productName, price }: ProductOptionsProps) => {
                       min="0"
                       max="99"
                       value={sizeQuantities[size]}
-                      onChange={(e) => handleQuantityChange(size, e)}
+                      onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleQuantityChange(size, e)}
                       className="w-12 text-center rounded-none border-x-0 h-8 px-0 border-primary/20 focus:ring-primary"
                     />
                     <Button

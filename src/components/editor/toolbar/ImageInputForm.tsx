@@ -6,7 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "../../../components/ui
 import LocalImageUpload from "./LocalImageUpload";
 
 interface ImageInputFormProps {
-    addImage: (type: string, properties: any) => void;
+    addImage: (type: 'image', properties: { image: HTMLImageElement; width: number; height: number; aspectRatio: number }) => void;
 }
 
 export default function ImageInputForm({ addImage }: ImageInputFormProps) {

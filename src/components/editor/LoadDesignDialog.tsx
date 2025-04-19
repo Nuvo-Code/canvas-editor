@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Button } from '@/components/ui/button';
+import { Button } from '../../components/ui/button';
 import {
   Dialog,
   DialogContent,
@@ -7,8 +7,8 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@/components/ui/dialog';
-import { loadAllDesigns, deleteDesign, type SavedDesign } from '@/lib/storage';
+} from '../../components/ui/dialog';
+import { loadAllDesigns, deleteDesign, type SavedDesign } from '../../lib/storage';
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faTrash } from '@fortawesome/free-solid-svg-icons';
 
@@ -76,7 +76,7 @@ export function LoadDesignDialog({ onLoad }: LoadDesignDialogProps) {
                     variant="ghost"
                     size="icon"
                     className="text-destructive hover:bg-destructive/10"
-                    onClick={(e) => handleDelete(design.id, e)}
+                    onClick={(e: React.MouseEvent) => handleDelete(design.id, e)}
                   >
                     <FontAwesomeIcon icon={faTrash} />
                   </Button>

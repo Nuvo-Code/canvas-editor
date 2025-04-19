@@ -1,15 +1,13 @@
 import { useState } from 'react';
-import { allMockups } from '@/lib/mockups';
-import type { MockupProps } from '@/types/mockups';
-import { Button } from '@/components/ui/button';
+import { allMockups } from '../../lib/mockups';
+import type { MockupProps } from '../../types/mockups';
 import {
   Select,
   SelectContent,
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from "@/components/ui/select";
-import { Label } from '@/components/ui/label';
+} from "../../components/ui/select";
 
 interface MockupSelectorProps {
   onSelectMockup: (mockup: MockupProps) => void;
@@ -21,7 +19,7 @@ export const MockupSelector = ({ onSelectMockup, currentMockup }: MockupSelector
 
   const handleMockupChange = (value: string) => {
     setSelectedMockup(value);
-    const mockup = allMockups.find(m => m.name === value);
+    const mockup = allMockups.find((m: any) => m.name === value);
     if (mockup) {
       onSelectMockup(mockup.generator());
     }
@@ -37,7 +35,7 @@ export const MockupSelector = ({ onSelectMockup, currentMockup }: MockupSelector
           <SelectValue placeholder="Select a mockup" />
         </SelectTrigger>
         <SelectContent>
-          {allMockups.map((mockup) => (
+          {allMockups.map((mockup: any) => (
             <SelectItem key={mockup.name} value={mockup.name}>
               {mockup.name}
             </SelectItem>

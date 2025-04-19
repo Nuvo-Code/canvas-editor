@@ -1,9 +1,9 @@
 import { useState, useEffect } from 'react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Label } from '@/components/ui/label';
-import { Input } from '@/components/ui/input';
-import { Slider } from '@/components/ui/slider';
-import { Switch } from '@/components/ui/switch-simple';
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card';
+import { Label } from '../../components/ui/label';
+import { Input } from '../../components/ui/input';
+import { Slider } from '../../components/ui/slider';
+import { Switch } from '../../components/ui/switch-simple';
 
 interface DesignableAreaControlsProps {
   x: number;
@@ -58,7 +58,7 @@ export const DesignableAreaControls = ({ x, y, width, height, onUpdate }: Design
             <Input
               type="number"
               value={x}
-              onChange={(e) => onUpdate('x', parseInt(e.target.value) || 0)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('x', parseInt(e.target.value) || 0)}
             />
           </div>
           <div className="space-y-2">
@@ -66,7 +66,7 @@ export const DesignableAreaControls = ({ x, y, width, height, onUpdate }: Design
             <Input
               type="number"
               value={y}
-              onChange={(e) => onUpdate('y', parseInt(e.target.value) || 0)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('y', parseInt(e.target.value) || 0)}
             />
           </div>
         </div>
@@ -88,14 +88,14 @@ export const DesignableAreaControls = ({ x, y, width, height, onUpdate }: Design
               min={50}
               max={600}
               value={width}
-              onChange={(e) => handleWidthChange(parseInt(e.target.value) || 0)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleWidthChange(parseInt(e.target.value) || 0)}
             />
             <Slider
               min={50}
               max={600}
               step={10}
               value={[width]}
-              onValueChange={([value]) => handleWidthChange(value)}
+              onValueChange={([value]: any) => handleWidthChange(value)}
               className="py-2"
             />
           </div>
@@ -106,14 +106,14 @@ export const DesignableAreaControls = ({ x, y, width, height, onUpdate }: Design
               min={50}
               max={600}
               value={height}
-              onChange={(e) => handleHeightChange(parseInt(e.target.value) || 0)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => handleHeightChange(parseInt(e.target.value) || 0)}
             />
             <Slider
               min={50}
               max={600}
               step={10}
               value={[height]}
-              onValueChange={([value]) => handleHeightChange(value)}
+              onValueChange={([value]: any) => handleHeightChange(value)}
               className="py-2"
             />
           </div>

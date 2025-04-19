@@ -1,4 +1,4 @@
-import CanvasEditor from '@/components/editor/CanvasEditor'
+import CanvasEditor from './components/editor/CanvasEditor'
 
 function App() {
   return (

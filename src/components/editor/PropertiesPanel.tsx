@@ -1,28 +1,29 @@
-import type { Shape } from '@/types/shapes'
-import { Button } from '@/components/ui/button'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Label } from '@/components/ui/label'
-import { Input } from '@/components/ui/input'
-import { Slider } from '@/components/ui/slider'
+import type { Shape } from '../../types/shapes'
+import { Button } from '../../components/ui/button'
+import { Card, CardContent, CardHeader, CardTitle } from '../../components/ui/card'
+import { Label } from '../../components/ui/label'
+import { Input } from '../../components/ui/input'
+import { Slider } from '../../components/ui/slider'
 import {
   Popover,
   PopoverContent,
   PopoverTrigger,
-} from '@/components/ui/popover'
+} from '../../components/ui/popover'
 import {
   Tabs,
   TabsContent,
   TabsList,
   TabsTrigger,
-} from '@/components/ui/tabs'
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
+} from '../../components/ui/tabs'
+import { RadioGroup, RadioGroupItem } from "../../components/ui/radio-group"
 import {
   Collapsible,
   CollapsibleContent,
   CollapsibleTrigger,
-} from '@/components/ui/collapsible'
+} from '../../components/ui/collapsible'
 import { ChevronDown } from 'lucide-react'
-import { ucwords } from '@/lib/utils'
+import { ucwords } from '../../lib/utils'
+import { JSX } from 'react'
 
 interface PropertiesPanelProps {
   selectedObject: Shape | undefined
@@ -53,7 +54,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
           <Input
             type="number"
             value={selectedObject.x}
-            onChange={(e) => onUpdate('x', parseInt(e.target.value))}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('x', parseInt(e.target.value))}
           />
         </div>
         <div className="space-y-2">
@@ -61,7 +62,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
           <Input
             type="number"
             value={selectedObject.y}
-            onChange={(e) => onUpdate('y', parseInt(e.target.value))}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('y', parseInt(e.target.value))}
           />
         </div>
       </div>
@@ -73,13 +74,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
           max={360}
           step={1}
           value={[selectedObject.rotation || 0]}
-          onValueChange={([value]) => onUpdate('rotation', value)}
+          onValueChange={([value]: any) => onUpdate('rotation', value)}
           className="py-4"
         />
         <Input
           type="number"
           value={selectedObject.rotation || 0}
-          onChange={(e) => onUpdate('rotation', parseInt(e.target.value))}
+          onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('rotation', parseInt(e.target.value))}
         />
       </div>
 
@@ -89,13 +90,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
           <Input
             type="color"
             value={selectedObject.fill || '#000000'}
-            onChange={(e) => onUpdate('fill', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('fill', e.target.value)}
             className="w-[60px] h-[40px] p-1"
           />
           <Input
             type="text"
             value={selectedObject.fill || '#000000'}
-            onChange={(e) => onUpdate('fill', e.target.value)}
+            onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('fill', e.target.value)}
             className="flex-1"
           />
         </div>
@@ -108,13 +109,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
             <Input
               type="color"
               value={selectedObject.stroke || '#000000'}
-              onChange={(e) => onUpdate('stroke', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('stroke', e.target.value)}
               className="w-[60px] h-[40px] p-1"
             />
             <Input
               type="text"
               value={selectedObject.stroke || '#000000'}
-              onChange={(e) => onUpdate('stroke', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('stroke', e.target.value)}
               className="flex-1"
             />
           </div>
@@ -125,13 +126,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
               max={10}
               step={0.5}
               value={[selectedObject.strokeWidth || 0]}
-              onValueChange={([value]) => onUpdate('strokeWidth', value)}
+              onValueChange={([value]: any) => onUpdate('strokeWidth', value)}
               className="py-4"
             />
             <Input
               type="number"
               value={selectedObject.strokeWidth || 0}
-              onChange={(e) => onUpdate('strokeWidth', parseFloat(e.target.value))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('strokeWidth', parseFloat(e.target.value))}
             />
           </div>
         </div>
@@ -140,7 +141,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
   )
 
   const renderSpecificProperties = () => {
-    const properties = {
+    const properties: Record<'rectangle' | 'circle' | 'text', JSX.Element> = {
       rectangle: (
         <div className="space-y-4">
           <div className="grid grid-cols-2 gap-4">
@@ -149,7 +150,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
               <Input
                 type="number"
                 value={selectedObject.width}
-                onChange={(e) => onUpdate('width', parseInt(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('width', parseInt(e.target.value))}
               />
             </div>
             <div className="space-y-2">
@@ -157,7 +158,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
               <Input
                 type="number"
                 value={selectedObject.height}
-                onChange={(e) => onUpdate('height', parseInt(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('height', parseInt(e.target.value))}
               />
             </div>
           </div>
@@ -172,13 +173,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
               max={200}
               step={1}
               value={[selectedObject.radius || 0]}
-              onValueChange={([value]) => onUpdate('radius', value)}
+              onValueChange={([value]: any) => onUpdate('radius', value)}
               className="py-4"
             />
             <Input
               type="number"
               value={selectedObject.radius}
-              onChange={(e) => onUpdate('radius', parseInt(e.target.value))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('radius', parseInt(e.target.value))}
             />
           </div>
         </div>
@@ -189,7 +190,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
             <Label>Text Content</Label>
             <Input
               value={selectedObject.text}
-              onChange={(e) => onUpdate('text', e.target.value)}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('text', e.target.value)}
             />
           </div>
           <div className="space-y-2">
@@ -199,13 +200,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
               max={72}
               step={1}
               value={[selectedObject.fontSize || 16]}
-              onValueChange={([value]) => onUpdate('fontSize', value)}
+              onValueChange={([value]: any) => onUpdate('fontSize', value)}
               className="py-4"
             />
             <Input
               type="number"
               value={selectedObject.fontSize}
-              onChange={(e) => onUpdate('fontSize', parseInt(e.target.value))}
+              onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('fontSize', parseInt(e.target.value))}
             />
           </div>
           <div className="space-y-2">
@@ -260,13 +261,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
               <Input
                 type="color"
                 value={selectedObject.stroke || '#000000'}
-                onChange={(e) => onUpdate('stroke', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('stroke', e.target.value)}
                 className="w-[60px] h-[40px] p-1"
               />
               <Input
                 type="text"
                 value={selectedObject.stroke || '#000000'}
-                onChange={(e) => onUpdate('stroke', e.target.value)}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('stroke', e.target.value)}
                 className="flex-1"
               />
             </div>
@@ -277,13 +278,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
                 max={10}
                 step={0.5}
                 value={[selectedObject.strokeWidth || 0]}
-                onValueChange={([value]) => onUpdate('strokeWidth', value)}
+                onValueChange={([value]: any) => onUpdate('strokeWidth', value)}
                 className="py-4"
               />
               <Input
                 type="number"
                 value={selectedObject.strokeWidth || 0}
-                onChange={(e) => onUpdate('strokeWidth', parseFloat(e.target.value))}
+                onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('strokeWidth', parseFloat(e.target.value))}
               />
             </div>
           </div>
@@ -302,13 +303,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
                   <Input
                     type="color"
                     value={selectedObject.shadowColor || '#000000'}
-                    onChange={(e) => onUpdate('shadowColor', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('shadowColor', e.target.value)}
                     className="w-[60px] h-[40px] p-1"
                   />
                   <Input
                     type="text"
                     value={selectedObject.shadowColor || '#000000'}
-                    onChange={(e) => onUpdate('shadowColor', e.target.value)}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('shadowColor', e.target.value)}
                     className="flex-1"
                   />
                 </div>
@@ -320,13 +321,13 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
                   max={20}
                   step={1}
                   value={[selectedObject.shadowBlur || 0]}
-                  onValueChange={([value]) => onUpdate('shadowBlur', value)}
+                  onValueChange={([value]: any) => onUpdate('shadowBlur', value)}
                   className="py-4"
                 />
                 <Input
                   type="number"
                   value={selectedObject.shadowBlur || 0}
-                  onChange={(e) => onUpdate('shadowBlur', parseInt(e.target.value))}
+                  onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('shadowBlur', parseInt(e.target.value))}
                 />
               </div>
               <div className="grid grid-cols-2 gap-4">
@@ -335,7 +336,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
                   <Input
                     type="number"
                     value={selectedObject.shadowOffsetX || 0}
-                    onChange={(e) => onUpdate('shadowOffsetX', parseInt(e.target.value))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('shadowOffsetX', parseInt(e.target.value))}
                   />
                 </div>
                 <div className="space-y-2">
@@ -343,7 +344,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
                   <Input
                     type="number"
                     value={selectedObject.shadowOffsetY || 0}
-                    onChange={(e) => onUpdate('shadowOffsetY', parseInt(e.target.value))}
+                    onChange={(e: React.ChangeEvent<HTMLInputElement>) => onUpdate('shadowOffsetY', parseInt(e.target.value))}
                   />
                 </div>
               </div>
@@ -353,7 +354,7 @@ export const PropertiesPanel = ({ selectedObject, onUpdate }: PropertiesPanelPro
       )
     }
 
-    return properties[selectedObject.type] || null
+    return properties[selectedObject.type as 'rectangle' | 'circle' | 'text'] || null
   }
 
   return (
