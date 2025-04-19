@@ -136,3 +136,17 @@ export const getExportPixelRatio = (): number => {
   }
   return 2; // Default fallback value
 };
+
+/**
+ * Gets the designable area configuration from environment variables
+ * @returns {Object} The designable area configuration
+ */
+export const getDesignableAreaConfig = () => {
+  return {
+    x: Number(import.meta.env.VITE_DESIGNABLE_AREA_X) || 150,
+    y: Number(import.meta.env.VITE_DESIGNABLE_AREA_Y) || 150,
+    width: Number(import.meta.env.VITE_DESIGNABLE_AREA_WIDTH) || 300,
+    height: Number(import.meta.env.VITE_DESIGNABLE_AREA_HEIGHT) || 300,
+    visible: import.meta.env.VITE_DESIGNABLE_AREA_VISIBLE !== 'false'
+  };
+};

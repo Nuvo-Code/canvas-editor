@@ -4,17 +4,18 @@ import { Rect } from 'react-konva';
 interface DesignableAreaProps {
   x: number;
   y: number;
-  size: number;
+  width: number;
+  height: number;
 }
 
-export const DesignableArea = forwardRef<any, DesignableAreaProps>(({ x, y, size }, ref) => {
+export const DesignableArea = forwardRef<any, DesignableAreaProps>(({ x, y, width, height }, ref) => {
   return (
     <Rect
       ref={ref}
       x={x}
       y={y}
-      width={size}
-      height={size}
+      width={width}
+      height={height}
       stroke="#000000"
       strokeWidth={2}
       dash={[10, 5]} // Creates a dotted line

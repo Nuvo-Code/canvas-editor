@@ -25,7 +25,7 @@ import {
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome'
 import { faGear } from '@fortawesome/free-solid-svg-icons'
 import { tshirt, allMockups } from '@/lib/mockups';
-import { getExportPixelRatio } from '@/lib/utils';
+import { getExportPixelRatio, getDesignableAreaConfig } from '@/lib/utils';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
 import type { MockupProps } from '@/types/mockups';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
@@ -33,12 +33,19 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 export const CanvasEditor = () => {
   const [backgroundImage, setBackgroundImage] = useState(tshirt());
-  // Fixed designable area - not editable
-  const designableArea = {
-    x: 150,  // Center of the 600x600 canvas, minus half the size
-    y: 150,
-    size: 300  // Size of the square designable area
-  };
+  // Get initial designable area config from environment variables
+  const initialConfig = getDesignableAreaConfig();
+
+  // Designable area state
+  const [designableArea, setDesignableArea] = useState({
+    x: initialConfig.x,
+    y: initialConfig.y,
+    width: initialConfig.width,
+    height: initialConfig.height
+  });
+
+  // Designable area visibility state
+  const [designableAreaVisible, setDesignableAreaVisible] = useState(initialConfig.visible);
 
   const {
     shapes,
@@ -82,8 +89,8 @@ export const CanvasEditor = () => {
 
   const handleShapeAdd = (type: string, properties = {}) => {
     // Set initial position to center of designable area
-    const centerX = designableArea.x + (designableArea.size / 2);
-    const centerY = designableArea.y + (designableArea.size / 2);
+    const centerX = designableArea.x + (designableArea.width / 2);
+    const centerY = designableArea.y + (designableArea.height / 2);
 
     // Estimate the size of the new shape
     const width = properties.width || (properties.radius ? properties.radius * 2 : 100);
@@ -110,9 +117,9 @@ export const CanvasEditor = () => {
   // Keep elements within the designable area
   const constrainToDesignArea = (x, y, width, height) => {
     const designLeft = designableArea.x;
-    const designRight = designableArea.x + designableArea.size;
+    const designRight = designableArea.x + designableArea.width;
     const designTop = designableArea.y;
-    const designBottom = designableArea.y + designableArea.size;
+    const designBottom = designableArea.y + designableArea.height;
 
     // Constrain x position
     let newX = x;
@@ -185,7 +192,8 @@ export const CanvasEditor = () => {
       setSelectedId(null);
 
       // Apply visibility changes based on export type
-      if ((exportType === 'no-dots' || exportType === 'no-background') && designableAreaRef.current) {
+      // Only need to hide the designable area if it's currently visible
+      if ((exportType === 'no-dots' || exportType === 'no-background') && designableAreaRef.current && designableAreaVisible) {
         designableAreaRef.current.visible(false);
       }
 
@@ -206,8 +214,8 @@ export const CanvasEditor = () => {
         // Calculate crop dimensions based on designable area
         const cropX = designableArea.x;
         const cropY = designableArea.y;
-        const cropWidth = designableArea.size;
-        const cropHeight = designableArea.size;
+        const cropWidth = designableArea.width;
+        const cropHeight = designableArea.height;
 
         // Generate the image with cropping
         dataURL = stageRef.current.toDataURL({
@@ -275,11 +283,11 @@ export const CanvasEditor = () => {
 
     // Add guides for designable area
     const designLeft = designableArea.x;
-    const designRight = designableArea.x + designableArea.size;
+    const designRight = designableArea.x + designableArea.width;
     const designTop = designableArea.y;
-    const designBottom = designableArea.y + designableArea.size;
-    const designMiddleX = designableArea.x + designableArea.size / 2;
-    const designMiddleY = designableArea.y + designableArea.size / 2;
+    const designBottom = designableArea.y + designableArea.height;
+    const designMiddleX = designableArea.x + designableArea.width / 2;
+    const designMiddleY = designableArea.y + designableArea.height / 2;
 
     // Check for alignment with designable area
     // Vertical alignments (left, center, right)
@@ -506,6 +514,20 @@ export const CanvasEditor = () => {
     setBackgroundImage(mockup);
   };
 
+  // Handler for updating designable area properties
+  const handleDesignableAreaUpdate = (property: string, value: number | boolean) => {
+    if (property === 'visible') {
+      // Update visibility state
+      setDesignableAreaVisible(value as boolean);
+    } else {
+      // Update position or size
+      setDesignableArea(prev => ({
+        ...prev,
+        [property]: value
+      }));
+    }
+  };
+
 
 
 
@@ -569,12 +591,13 @@ export const CanvasEditor = () => {
               />
             )}
 
-            {/* Designable area with dotted border */}
+            {/* Designable area with dotted border - only shown if visible */}
             <DesignableArea
               ref={designableAreaRef}
               x={designableArea.x}
               y={designableArea.y}
-              size={designableArea.size}
+              width={designableArea.width}
+              height={designableArea.height}
             />
 
             {/* Alignment guides */}
@@ -664,8 +687,22 @@ export const CanvasEditor = () => {
           </Tabs>
         </div>
 
+        {/* Designable Area Controls */}
+        {
+          designableAreaVisible &&
+          <div className="border rounded-md bg-card shadow-md">
+            <DesignableAreaControls
+              x={designableArea.x}
+              y={designableArea.y}
+              width={designableArea.width}
+              height={designableArea.height}
+              onUpdate={handleDesignableAreaUpdate}
+            />
+          </div>
+        }
+
         {/* Product Options Section */}
-        <div className="border rounded-md bg-card shadow-md">
+        <div className="border rounded-md bg-card shadow-md mt-4">
           <ProductOptions
             productName={`Custom ${backgroundImage.name}`}
             price={24.99}
