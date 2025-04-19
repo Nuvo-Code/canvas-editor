@@ -9,7 +9,7 @@ import { PropertiesPanel } from './PropertiesPanel';
 import { MockupSelector } from './MockupSelector';
 import { LayerPanel } from './LayerPanel';
 
-import { ExportDialog } from './ExportDialog';
+import { ExportDialog, ExportType } from './ExportDialog';
 import { DesignableArea } from './DesignableArea';
 import { DesignableAreaControls } from './DesignableAreaControls';
 import { ProductOptions } from './ProductOptions';
@@ -70,6 +70,7 @@ export const CanvasEditor = () => {
   }, [currentState]);
 
   const backgroundImageRef = useRef(null);
+  const designableAreaRef = useRef(null);
   const stageRef = useRef(null);
   const transformerRef = useRef(null);
 
@@ -169,14 +170,38 @@ export const CanvasEditor = () => {
     }
   };
 
-  const handleExport = (format: string, quality: number, filename: string) => {
+  const handleExport = (format: string, quality: number, filename: string, exportType: ExportType) => {
     if (stageRef.current) {
+      // Store original visibility states
+      const designableAreaVisible = designableAreaRef.current?.visible();
+      const backgroundVisible = backgroundImageRef.current?.visible();
+
+      // Apply visibility changes based on export type
+      if ((exportType === 'no-dots' || exportType === 'no-background') && designableAreaRef.current) {
+        designableAreaRef.current.visible(false);
+      }
+
+      if (exportType === 'no-background' && backgroundImageRef.current) {
+        backgroundImageRef.current.visible(false);
+      }
+
+      // Generate the image
       const dataURL = stageRef.current.toDataURL({
         mimeType: format === 'jpeg' ? 'image/jpeg' : 'image/png',
         quality: format === 'jpeg' ? quality / 100 : 1,
         pixelRatio: 2 // Higher resolution
       });
 
+      // Restore original visibility
+      if (designableAreaRef.current) {
+        designableAreaRef.current.visible(designableAreaVisible);
+      }
+
+      if (backgroundImageRef.current) {
+        backgroundImageRef.current.visible(backgroundVisible);
+      }
+
+      // Trigger download
       const link = document.createElement("a");
       link.href = dataURL;
       link.download = `${filename}.${format}`;
@@ -505,6 +530,7 @@ export const CanvasEditor = () => {
 
             {/* Designable area with dotted border */}
             <DesignableArea
+              ref={designableAreaRef}
               x={designableArea.x}
               y={designableArea.y}
               size={designableArea.size}

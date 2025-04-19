@@ -4,6 +4,7 @@ import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { Slider } from '@/components/ui/slider';
 import { RadioGroup, RadioGroupItem } from '@/components/ui/radio-group';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import {
   Dialog,
   DialogContent,
@@ -14,18 +15,21 @@ import {
   DialogTrigger,
 } from '@/components/ui/dialog';
 
+export type ExportType = 'complete' | 'no-dots' | 'no-background';
+
 interface ExportDialogProps {
-  onExport: (format: string, quality: number, filename: string) => void;
+  onExport: (format: string, quality: number, filename: string, exportType: ExportType) => void;
 }
 
 export function ExportDialog({ onExport }: ExportDialogProps) {
   const [format, setFormat] = useState('png');
   const [quality, setQuality] = useState(90);
   const [filename, setFilename] = useState('my-design');
+  const [exportType, setExportType] = useState<ExportType>('complete');
   const [open, setOpen] = useState(false);
 
   const handleExport = () => {
-    onExport(format, quality, filename);
+    onExport(format, quality, filename, exportType);
     setOpen(false);
   };
 
@@ -53,7 +57,7 @@ export function ExportDialog({ onExport }: ExportDialogProps) {
               className="col-span-3"
             />
           </div>
-          
+
           <div className="grid grid-cols-4 items-center gap-4">
             <Label className="text-right">Format</Label>
             <RadioGroup
@@ -71,7 +75,24 @@ export function ExportDialog({ onExport }: ExportDialogProps) {
               </div>
             </RadioGroup>
           </div>
-          
+
+          <div className="grid grid-cols-4 items-center gap-4">
+            <Label className="text-right">Export Type</Label>
+            <Select
+              value={exportType}
+              onValueChange={(value: ExportType) => setExportType(value)}
+            >
+              <SelectTrigger className="col-span-3">
+                <SelectValue placeholder="Select export type" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="complete">Complete Design</SelectItem>
+                <SelectItem value="no-dots">Without Designable Area Dots</SelectItem>
+                <SelectItem value="no-background">Without Background & Dots</SelectItem>
+              </SelectContent>
+            </Select>
+          </div>
+
           {format === 'jpeg' && (
             <div className="grid grid-cols-4 items-center gap-4">
               <Label className="text-right">Quality</Label>

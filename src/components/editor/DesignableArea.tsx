@@ -1,3 +1,4 @@
+import { forwardRef } from 'react';
 import { Rect } from 'react-konva';
 
 interface DesignableAreaProps {
@@ -6,9 +7,10 @@ interface DesignableAreaProps {
   size: number;
 }
 
-export const DesignableArea = ({ x, y, size }: DesignableAreaProps) => {
+export const DesignableArea = forwardRef<any, DesignableAreaProps>(({ x, y, size }, ref) => {
   return (
     <Rect
+      ref={ref}
       x={x}
       y={y}
       width={size}
@@ -20,6 +22,6 @@ export const DesignableArea = ({ x, y, size }: DesignableAreaProps) => {
       listening={false} // Makes it non-interactive
     />
   );
-};
+});
 
 export default DesignableArea;
